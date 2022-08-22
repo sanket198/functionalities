@@ -1,0 +1,178 @@
+<ul class="site-nav list--inline {{ nav_alignment }}" id="SiteNav">
+  {% for link in linklists[section.settings.main_linklist].links %}
+    {%- assign child_list_handle = link.title | handleize -%}
+	
+    {% comment %}
+      Check if third-level nav exists on each parent link.
+    {% endcomment %}    
+	
+  
+  {% assign hasmega = false %}
+  {% assign link_handle = link.handle | downcase %}  
+  {% for block in section.blocks %} 
+  {% assign user_handle = block.settings.link_handle | downcase %}
+  {% if link_handle == user_handle %} 
+  {% assign hasmega = true %}
+  {% assign fi = forloop.index0 %}  
+  {% endif %} 
+  {% endfor %}
+  {%- assign three_level_nav = false -%}
+  
+  
+  	{% if hasmega %}
+      <li class="site-nav--has-dropdown{% if three_level_nav %} site-nav--has-centered-dropdown{% endif %}{% if link.active %} site-nav--active{% endif %}" data-has-dropdowns>
+        <button class="site-nav__link site-nav__link--main site-nav__link--button{% if link.child_active %} site-nav__link--active{% endif %}" type="button" aria-expanded="false" aria-controls="SiteNavLabel-{{ child_list_handle }}">
+          <span class="site-nav__label">{{ link.title | escape }}</span>{% include 'icon-chevron-down' %}
+        </button>
+		
+        <div class="site-nav__dropdown{% if three_level_nav %} site-nav__dropdown--centered{% endif %}" id="SiteNavLabel-{{ child_list_handle }}">          
+
+          
+              {% assign bls = section.blocks[fi] %}
+              {% assign total_column = bls.settings.column_select %}
+              <div class="image_mega_menu">
+                {% for i in (1..total_column) %}              
+                    {% if bls.settings.menu_options == '2' %}
+                        {% capture img %}image_pick{{ i }}{% endcapture %}  	
+                        {% assign imgid = bls.settings[img] %}          
+                        {% if imgid != blank %}              
+                          <img src="{{ imgid | img_url:'compact' }}" alt="Mega Menu Image">
+                        {% endif %}
+                    {% endif %}
+                    <div class="mega_menu">          
+                            <ul>                         
+                              {% capture nav %}mega_list{{ i }}{% endcapture %}  
+                              {% assign linkid = bls.settings[nav] %} 
+                              {% capture ttl %}magamenu_title{{ i }}{% endcapture %}
+                              {% assign meg_title = bls.settings[ttl] %}
+                              {% if linkid != blank %}<h3 class="link_title">{% if meg_title != blank %}{{ meg_title }}{% else %}Menu{% endif %}</h3>{% endif %}
+                              {% for childlink in linklists[linkid].links %}
+                                  <li>
+                                    <a href="{{ childlink.url }}"
+                                       class="site-nav__link site-nav__child-link{% if forloop.last %} site-nav__link--last{% endif %}"
+                                       {% if childlink.current %} aria-current="page"{% endif %}
+                                       >
+                                      <span class="site-nav__label">{{ childlink.title | escape }}</span>
+                                    </a>
+                                  </li>
+                              {% endfor %}
+                            </ul>
+                      </div>
+              	{% endfor %}  
+              </div>
+         
+        </div>
+      </li>  	
+    {% else %}
+      <li {% if link.active %} class="site-nav--active"{% endif %}>
+        <a href="{{ link.url }}"
+          class="site-nav__link site-nav__link--main{% if link.active %} site-nav__link--active{% endif %}"
+          {% if link.current %} aria-current="page"{% endif %}
+        >
+          <span class="site-nav__label">{{ link.title | escape }}</span>
+        </a>
+      </li>
+      {% endif %}  	
+  {% endfor %}
+</ul>
+
+
+
+
+"blocks": [
+		{
+			"name": "mega-menu",
+			"type": "menu",
+			"settings": [
+				{
+					"type": "text",
+					"id": "link_handle",
+					"label": "Menu Title"
+				},
+				{
+					"type": "select",
+					"id": "menu_options",
+					"label": "Menu style Select",
+					"options": [
+						{
+							"group": "Menu Style",
+							"value": "1",
+							"label": "Only Menu"
+						},
+						{
+							"group": "Menu Style",
+							"value": "2",
+							"label": "Menu With Image"
+						}						
+					]
+				},
+				{
+					"type": "select",
+					"id": "column_select",
+					"label": "Column Select",
+					"options": [
+						{
+							"group": "Columns",
+							"value": "1",
+							"label": "1 column"
+						},
+						{
+							"group": "Columns",
+							"value": "2",
+							"label": "2 column"
+						},
+						{
+							"group": "Columns",
+							"value": "3",
+							"label": "3 column"
+						}
+					]
+				},
+				{
+					"type": "link_list",
+					"id": "mega_list1",
+					"label": "First Select Menu"
+				},
+				{
+					"type": "link_list",
+					"id": "mega_list2",
+					"label": "Second Select Menu"
+				},
+				{
+					"type": "link_list",
+					"id": "mega_list3",
+					"label": "Third Select Menu"
+				},
+				{
+					"type": "image_picker",
+					"id": "image_pick1",
+					"label": "Select first Image"
+				},
+				{
+					"type": "image_picker",
+					"id": "image_pick2",
+					"label": "Select Second Image"
+				},
+				{
+					"type": "image_picker",
+					"id": "image_pick3",
+					"label": "Select Third Image"
+				},
+				{
+					"type": "text",
+					"id": "magamenu_title1",
+					"label": "Menu Title 1"
+				},
+				{
+					"type": "text",
+					"id": "magamenu_title2",
+					"label": "Menu Title 2"
+				},
+				{
+					"type": "text",
+					"id": "magamenu_title3",
+					"label": "Menu Title 3"
+				}
+			]
+		}
+	]

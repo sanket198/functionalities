@@ -1,0 +1,74 @@
+
+formate  :2019-08-27 1:00:00 am
+
+        {% assign hideFrom = settings.enblon | date: '%s' %} 
+        {% assign hideFrom = hideFrom | plus: 0 %} 
+        {% assign hideTo = settings.enblout | date: '%s' %}
+        {% assign hideTo = hideTo | plus: 0 %}
+        {% assign nowdate = 'now' | date: '%s' %}
+        {% assign nowdate = nowdate | plus: 0 %}
+        {% assign enddate = settings.enblout | split : ' ' | first | replace : '-','/' %}
+        {% capture sections %}
+        	<div > 
+        	  ----
+        	</div>  
+        {% endcapture %} 
+{% capture sale_offer %}
+        	<div > 
+        	  ----
+        	</div>  
+        {% endcapture %} 
+{% if settings.enblon != blank and settings.enblout != blank %}
+          {% if nowdate >= hideFrom and nowdate <= hideTo %}
+              {{ sections }}
+          {% else %}
+         	 {{sale_offer}}
+          {% endif %}
+        {% else %}
+            {{sale_offer}}
+        {% endif %}
+====================js=============
+<script src="{{ 'flipclock.js' | asset_url }}"></script>	
+<link href="{{ 'flipclock.css' | asset_url }}"  rel="stylesheet" type="text/css" media="all" >
+
+
+<script>
+   {% assign nowdate = 'now' | date: "%s" %}
+  $(document).ready(function() {
+    var start_date = '{{ settings.enblon | date: "%s" }}';
+    var end_date = '{{ settings.enblout | date: "%s" }}';
+    var now = new Date ('{{ nowdate }}');   
+    var clock;
+    var now_diff = ({{ nowdate }} - start_date);
+    var diff = (end_date - {{ nowdate }});
+    if(start_date < end_date && {{ nowdate }} < end_date){
+      if(diff<= 86400){
+        var clock = $('.clock').FlipClock(diff,{
+          countdown: true
+        });		
+      }else{
+        var clock = $('.clock').FlipClock(diff,{
+          clockFace: 'DailyCounter',
+          countdown: true,
+          showSeconds: false
+        });	
+      }
+    }  
+
+  });
+</script>
+================================
+{
+        "type": "text",
+        "id": "enblon",
+        "label": "offer start on",
+        "info": "Exact formate: YYYY-MM-DD HH:MM:SS am\/pm",
+        "placeholder": "2018-12-31 01:20:00 am\/pm"
+      },
+      {
+        "type": "text",
+        "id": "enblout",
+        "label": "offer end on",
+        "info": "Exact formate: YYYY-MM-DD HH:MM:SS am\/pm",
+        "placeholder": "2020-12-31 01:20:00 am\/pm"
+      }

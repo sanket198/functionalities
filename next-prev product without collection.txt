@@ -1,0 +1,27 @@
+//next-prev Product without collection
+
+
+
+
+{% assign first_collection = product.collections.first %}	
+    {% for current_product in first_collection.products %}
+        {% assign index = forloop.index0 %}
+        {% assign next_index = forloop.index %}
+
+        {% if index > 0 %}
+            {% assign prev_index = index | minus: 1 %}
+        {% endif %}
+
+        {% if current_product.title == product.title %}
+            {% assign prev_prod_url = first_collection.products[prev_index].url %}
+            {% assign next_prod_url = first_collection.products[next_index].url %}			
+            {% break %}
+        {% endif %}
+    {% endfor %}
+
+{% if prev_prod_url != blank %}
+<a href="{{ prev_prod_url | within: first_collection }}">Previous</a>
+{% endif %}
+{% if next_prod_url != blank %}
+<a href="{{ next_prod_url | within: first_collection }}">Next</a>
+{% endif %}

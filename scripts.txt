@@ -1,0 +1,268 @@
+
+var form = $('.single-option-selector').closest('form');
+	form.append('<div id="swatch"></div>');
+	$('.single-option-selector').each(function(){
+ 		var opt = $(this);
+		var label = opt.closest('div').find('label').text();
+		//console.log(label);
+		var ele = '<ul class="swatch-'+label+'" data-option="'+opt.attr('id')+'">';
+		$(this).find('Option').each(function(i,v){
+			ele += '<li data-val="'+$(v).val()+'">'+$(v).val()+'</li>';
+		});
+		ele += '</ul>';
+		$('#swatch').append(ele);
+	});
+	$('.span6').on('click','#swatch li',function(){
+		$('#swatch li').removeAttr('style');
+		var sel = $(this).parent('ul').attr('data-option');
+		var val = $(this).attr('data-val');
+		$('#'+sel).val(val).trigger('change');
+		$(this).css('border','2px solid red');
+	});
+
+
+
+
+//tabs jquery	
+
+var form = $('.purchase').closest('form');
+
+$('<div id="combine"></div>').insertBefore(form);
+
+var c = 0;
+
+var i;
+
+for(i=0;i<2;i++){
+	
+	$('#combine').prepend('<button onclick="onc('+c+')">click'+c+'</button>');
+	
+	$('#combine').append('<div class="div-'+c+'"></div>');
+	
+	c++;
+
+	}
+
+$('.div-0').text("122433345432334532443");
+
+$('.div-1').text("abacaukokjisdkdnsksdksdlsdmdkjodkdsmldksdld");
+
+$('#combine div').css('display','none');
+
+function onc(c){
+	
+	$('#combine div').css('display','none');
+	
+	$('.div-'+c).css('display','block');
+
+}
+
+
+
+
+//slide
+
+
+var form = $('.purchase').closest('form');
+$('<div id="combine"></div>').insertBefore(form);
+$('#combine').text('click');
+$('<div class="second">click again</div>').insertAfter('#combine');
+$('.second').css('display','none');
+$('#combine').on('click',function(){
+	$('.second').slideToggle();
+});
+
+
+
+
+//order page script
+
+<script>
+   window.uetq = window.uetq || []; 
+   window.uetq.push('event', '', { 'revenue_value': {{ subtotal_price | money_without_currency }}, 'currency': '{{ shop.currency }}' }); 
+
+   window.uetq = window.uetq || []; 
+   window.uetq.push('event', '', { 'revenue_value': {{ total_price | money_without_currency }}, 'currency': '{{ shop.currency }}' }); 
+</script>
+
+ window.renderOptIn = function() { 
+    window.gapi.load('surveyoptin', function() {
+      window.gapi.surveyoptin.render(
+        {
+          "merchant_id": 104809825,
+          "order_id": "{{order.order_number}}",
+          "email": "{{order.email}}",
+          "delivery_country": "{{order.shipping_address.country_code}}",
+          "estimated_delivery_date": "{{'now' | date: "%s" | minus : -604800 | date: "%F" | uri_encode | replace:"+","%20"}}",
+          "opt_in_style": "CENTER_DIALOG"
+        }); 
+     });
+  }
+
+
+
+//multiple images for one variants
+
+<input id="swatch-{{ option_index }}-{{ value | handle }}" type="radio" name="option-{{ option_index }}" value="{{ value | escape }}"{% if forloop.first %} checked{% endif %} {% unless variant.available %}disabled{% endunless %} />
+
+<script>
+    $('body').on('change load','input[name=option-' + {{ option_index }} +']', function () {      
+	var label = $('input[name=option-' + {{ option_index }} +']:checked').val();       
+     var i = 0;
+     var images = [];
+     var all_images = $(".gallery-image");
+      all_images.hide().html("");
+    {% for image in product.images %}
+    		images.push({url: "{{ image | img_url: 'master' }}", alt: "{{ image.alt }}"});
+    {% endfor %}
+		$.each( images, function( i, image ) {
+       var alt = images[i].alt, url = images[i].url; 
+		if ($(this).attr("alt") == label) {     
+         $('.product-gallery').append('<div class="gallery-image"><img src="'+ url +'" alt="{{ images[i].alt }}"></div>');
+		}
+        i++;
+	});     
+});
+</script>
+
+<div class="col-two">
+                <div class="product-gallery">
+                  {% for image in product.images %}
+                  {% if product.options contains 'Color' %}
+                  	{% for option in product.selected_or_first_available_variant.options %}
+                  	 <div class="gallery-image">{% if option == image.alt %}<img src=" {{ image | img_url: 'master' }}" alt="Product Image">{% endif %}</div>
+                  	{% endfor %}
+				  {% else %}
+                 	 <div class="gallery-image"><img src=" {{ product.featured_image | img_url:'master' }}" alt="Product Image"></div>
+                  {% endif %}                  
+                  {% endfor %}                  
+                </div>              		 
+            </div>
+
+
+
+
+
+//filter by tag and collection
+
+
+{% if collection.handle == blank %}
+		{% assign pro_col = product.collections.first %}
+		{% assign first_col = pro_col.title %}
+{% else %}
+		{% assign first_col = collection.handle %}		
+{% endif %}
+<section class="related-products">
+    <div class="container">
+        <div class="sec-title"><h3>{{ section.settings.related_pro_title }}</h3></div>
+        <div class="col-row"> 
+          	{% assign current_pro = product.id %}           	
+          	{% assign pro_row = section.settings.pro_num %}
+          	{% assign pro_row = pro_row | plus: 0 %}
+          	{% assign count = 0 %}
+          			   
+          {% for ct in product.tags %}
+          {% if ct contains '||' %}          				
+          {% assign cp_t = ct | remove:'||'  %}
+          {% endif %}	
+          {% endfor %}          		
+          		{% for pro_col in collections[first_col].products %}
+                {% assign rel_tag = '' %}
+                {% for t in pro_col.tags %}
+                {% if t contains '||' %}          			
+                {% assign rel_tag = t | remove:'||'  %}   
+                {% endif %}
+                {% endfor %}           		          			
+          			{% if cp_t == rel_tag %}          			
+          			{% unless pro_col.id == current_pro %}
+         			{% assign count = count | plus: 1 %}
+               		 <div class="{% if pro_row == 2 %}col-two{% elsif pro_row  == 3 %}col-three{% elsif pro_row  == 4 %}col-four{% elsif pro_row  == 5 %}col-five{% endif %} product-item" id="slick">
+                        <div class="product-img">
+                            <a href="{{ pro_col.url |  within: collection }}"><img src="{% if pro_col.featured_image != blank %}{{ pro_col.featured_image | img_url:'master' }}{% else %}https://dummyimage.com/413.33x275.02/000/fff&text=no+image{% endif %}" alt="Adra Steel Grey"></a>
+                            <div class="quick-shop">
+                                <a href="{{ pro_col.url }}" class="quick-btn">+ Quick Shop</a>
+                                <div class="quick-sizes">                                                                  
+                                  {% for option in pro_col.options_with_values %}
+                                	{% for value in option.values %}
+                                        {% if option.name == 'Size' %}                                			
+                                            {% for variant in pro_col.variants %}
+                								{% if variant.option1 == value and variant.option2 == pro_col.selected_or_first_available_variant.option2 %}
+                                                  <form method="post" action="">
+                                                    <input type="hidden" name="id" value="{{ variant.id }}" />
+                                                    <button type="submit" class="shop_cart_btn" id="shop-add_cart_btn">{{ value }}</button>
+                                                  </form>
+                								{% endif %}
+              								{% endfor %}
+                                        {% endif %}
+                                	{% endfor %}
+                                {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <h2 class="product-meta">
+                            <span class="product-title"><a href="{{ pro_col.url |  within: collection }}">{{ pro_col.title }}</a><span class="price">{{ pro_col.price | money }}</span></span>
+                            <span class="product-conf">
+                              {% for option in pro_col.options_with_values %}                                     
+                                      {% if option.name == 'Color' %}                                
+                                          {{ option.values.size }} colors availabale
+                                      {% endif %}
+                                  {% endfor %}                            
+                              </span>
+                        </h2>
+                    </div>             			
+                    {% endunless %}    
+                    {% if count == pro_row %}
+                        {% break %}
+                    {% endif %} 
+          		{% endif %}
+              {% endfor %}       	
+          </div>
+    </div>
+</section>
+
+
+{% schema %}
+  {
+    "name": "Related Product",
+    "settings": [
+		{
+          "type": "text",
+          "id": "related_pro_title",
+          "label": "Related Product Title"
+		},
+		{
+			"type": "select",
+			"id": "pro_num",
+			"label": "product Per Row",	
+			"options":[				
+				{
+					 "group": "number",
+                     "value": "2",
+                     "label": "2"
+				},
+				{
+					 "group": "number",
+                     "value": "3",
+                     "label": "3"
+				},
+				{
+					 "group": "number",
+                     "value": "4",
+                     "label": "4"
+				},
+				{
+					 "group": "number",
+                     "value": "5",
+                     "label": "5"
+				}
+			],
+			"default": "3"
+		}
+	]
+  }
+{% endschema %}
+
+
+//subscription with discount url
+ var t = "&cart_token=" + (document.cookie.match("(^|; )cart=([^;]*)") || 0)[2];          
+         window.location.href='https://checkout.rechargeapps.com/r/checkout?myshopify_domain=tenzo-tea.myshopify.com'+ t +'&discount=PIN5';  

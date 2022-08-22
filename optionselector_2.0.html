@@ -1,0 +1,130 @@
+{% layout none %}
+{% assign current_variant = product.selected_or_first_available_variant %}
+{% form 'product', product, novalidate: 'novalidate', class: 'product_form' %}
+<p data_p_price>{{ current_variant.price | money }} {% if compare_at_price > price %}<del>{{ current_variant.compare_at_price | money }}</del>{% endif %}</p>
+
+<select name="id" id="ProductSelect-{{ product.id }}" style="display: none;">
+  {% for variant in product.variants %}
+  <option value="{{ variant.id }}"
+          {%- if variant == current_variant %} selected="selected" {%- endif -%}
+          >
+    {{ variant.title }}  {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+                </option>
+  {% endfor %}
+</select>
+{% unless product.has_only_default_variant %}
+<div class="all_options">
+  {% for option in product.options_with_values %}
+  <div class="selector-wrapper">
+    <label for="single_selector_{{ forloop.index0 }}">
+      {{ option.name }}
+    </label>
+    <select class="single-option-selector" id="single_selector_{{ forloop.index0 }}" data-option_index="{{ forloop.index0 }}">
+      {% for value in option.values %}
+      <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {% endfor %}
+</div>
+{% endunless %}
+
+<button class="add_to_cart_btn" {% unless current_variant.available %} disabled="disabled"{% endunless %} atc_btn>
+  <span class="atc_btn_text" atc_txt>
+    {% unless current_variant.available %}Soldout{% else %}Add To cart{% endunless %}
+  </span>
+</button>
+{% endform %}
+{% unless product.has_only_default_variant %}
+<script>
+  function formatMoney(cents, format) {
+    if (typeof cents === 'string') {
+      cents = cents.replace('.', '');
+    }
+    var value = '';
+    var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+    var formatString = format || moneyFormat;
+    function formatWithDelimiters(number, precision, thousands, decimal) {
+      thousands = thousands || ',';
+      decimal = decimal || '.';
+      if (isNaN(number) || number === null) {
+        return 0;
+      }
+      number = (number / 100.0).toFixed(precision);
+      var parts = number.split('.');
+      var dollarsAmount = parts[0].replace(
+        /(\d)(?=(\d\d\d)+(?!\d))/g,
+        '$1' + thousands
+      );
+      var centsAmount = parts[1] ? decimal + parts[1] : '';
+      return dollarsAmount + centsAmount;
+    }
+    switch (formatString.match(placeholderRegex)[1]) {
+      case 'amount':
+        value = formatWithDelimiters(cents, 2);
+        break;
+      case 'amount_no_decimals':
+        value = formatWithDelimiters(cents, 0);
+        break;
+      case 'amount_with_comma_separator':
+        value = formatWithDelimiters(cents, 2, '.', ',');
+        break;
+      case 'amount_no_decimals_with_comma_separator':
+        value = formatWithDelimiters(cents, 0, '.', ',');
+        break;
+      case 'amount_no_decimals_with_space_separator':
+        value = formatWithDelimiters(cents, 0, ' ');
+        break;
+      case 'amount_with_apostrophe_separator':
+        value = formatWithDelimiters(cents, 2, "'");
+        break;
+    }
+    return formatString.replace(placeholderRegex, value);
+  }
+  var moneyFormat= {{ shop.money_format | json }}
+  var getVariantData = {{ product.variants | json }}
+  var main_select = document.getElementById("ProductSelect-{{ product.id }}");
+  function getvariant(title) {
+    return getVariantData.filter( function(getVariantData){  return JSON.stringify(getVariantData.options) === JSON.stringify(title);} );
+  }
+  function updateQueryStringParameter(uri, key, value) {
+    var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i"), separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    return (uri.match(re)) ? uri.replace(re, '$1' + key + "=" + value + '$2') : uri + separator + key + "=" + value;
+  }
+  var selectCallback = function(cbox) {
+    var variant_optins = [];
+    for (var i = 0; i < cbox.length; i++) {
+      variant_optins.push(document.querySelector('.product_form [data-option_index="'+ i +'"]').value);
+    }
+    var variant = getvariant(variant_optins)[0];
+    if(typeof variant !== 'undefined'){
+      main_select.value = variant.id;
+      main_select.dispatchEvent(new Event('change'));
+      var newUrl=updateQueryStringParameter(window.location.href,"variant",variant.id);
+      window.history.pushState("", newUrl, newUrl);
+      if(variant.available){
+        document.querySelector('.product_form [atc_txt]').innerHTML = 'Add to cart';
+        document.querySelector('.product_form [atc_btn]').disabled = false;
+      }else{
+        document.querySelector('.product_form [atc_txt]').innerHTML = 'Sold Out';
+        document.querySelector('.product_form [atc_btn]').disabled = true;
+      }
+      var price = formatMoney(variant.price, moneyFormat);
+      price += (variant.compare_at_price > variant.price) ? '<del>'+formatMoney(variant.compare_at_price, moneyFormat)+'</del>' : '';
+      document.querySelector('.product_form [data_p_price]').innerHTML = price;
+    }else{
+      document.querySelector('.product_form [atc_txt]').innerHTML = 'Unavailable';
+      document.querySelector('.product_form [atc_btn]').disabled = true;
+    }
+  };
+  var cbox = document.querySelectorAll(".product_form [data-option_index]");
+  for (var i = 0; i < cbox.length; i++) {
+    cbox[i].addEventListener("change", function() {
+      selectCallback(cbox);
+    });
+  }
+  (function() {
+    selectCallback(cbox);
+  })();
+</script>
+{% endunless %}

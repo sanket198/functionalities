@@ -1,0 +1,327 @@
+<!--wrapper start here-->
+<div class="wrapper">
+  <section class="collection-filter" data-filtertypegrp="true">
+    <div class="cs-container">
+      <div class="col-filter">
+        <ul>
+          <li>
+            <a href="javascript:void(0)" class="cm-filter-by">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23" viewBox="0 0 24 23">
+                <path
+                      d="M2.1 21.6V1.1c0-.6.3-1.1.7-1.1.4 0 .7.5.7 1.1v20.5c0 .6-.3 1.1-.7 1.1-.4 0-.7-.5-.7-1.1" />
+                <path
+                      d="M11.1 21.6V1.1c0-.6.3-1.1.7-1.1.4 0 .7.5.7 1.1v20.5c0 .6-.3 1.1-.7 1.1-.4 0-.7-.5-.7-1.1" />
+                <path
+                      d="M20.1 21.6V1.1c0-.6.3-1.1.7-1.1.4 0 .7.5.7 1.1v20.5c0 .6-.3 1.1-.7 1.1-.4 0-.7-.5-.7-1.1" />
+                <path fill="#fff"
+                      d="M5 12.3c0 1.2-1 2.2-2.2 2.2-1.2 0-2.2-1-2.2-2.2 0-1.2 1-2.2 2.2-2.2 1.2 0 2.2 1 2.2 2.2" />
+                <path
+                      d="M4.5 12.3c0 1-.8 1.7-1.7 1.7-.333 0-2.423-1.178-2.675-1.33A2.687 2.687 0 0 0 2.8 15c1.5 0 2.7-1.2 2.7-2.7 0-1.5-1.2-2.7-2.7-2.7-.13 0-1.335 1.797-1.46 1.815.304-.504.86-.815 1.46-.815.9 0 1.6.8 1.7 1.7zm-3.4 0c0-.333 1.166-2.422 1.318-2.674A2.687 2.687 0 0 0 .1 12.3c0 .126 1.798 1.338 1.815 1.46A1.703 1.703 0 0 1 1.1 12.3z" />
+                <path fill="#fff"
+                      d="M14 7.6c0 1.2-1 2.2-2.2 2.2-1.2 0-2.2-1-2.2-2.2 0-1.2 1-2.2 2.2-2.2 1.2 0 2.2 1 2.2 2.2" />
+                <path
+                      d="M13.5 7.6c0 1-.7 1.7-1.7 1.7s-1.7-.7-1.7-1.7.8-1.7 1.7-1.7c.9 0 1.7.7 1.7 1.7zm1 0c0-1.5-1.2-2.7-2.7-2.7-1.5 0-2.7 1.2-2.7 2.7 0 1.5 1.2 2.7 2.7 2.7 1.5 0 2.7-1.2 2.7-2.7z" />
+                <path fill="#fff"
+                      d="M23 15c0 1.2-1 2.2-2.2 2.2-1.2 0-2.2-1-2.2-2.2 0-1.2 1-2.2 2.2-2.2 1.2 0 2.2 1 2.2 2.2" />
+                <path
+                      d="M22.5 15.1c0 .333-1.173 2.423-1.325 2.675A2.687 2.687 0 0 0 23.5 15.1c0-1.5-1.2-2.7-2.7-2.7-1.5 0-2.7 1.2-2.7 2.7 0 1.5 1.2 2.7 2.7 2.7.127 0 1.337-1.798 1.46-1.815-.304.504-.86.815-1.46.815-1 0-1.7-.8-1.7-1.7 0-1 .8-1.7 1.7-1.7.9 0 1.6.7 1.7 1.7z" />
+              </svg>
+              <span>FILTER</span>
+            </a>
+          </li> 
+          <li>
+            <a href="javascript:void(0)" class="filter-sortby">
+              <svg xmlns="http://www.w3.org/2000/svg" width="19" height="10" viewBox="0 0 19 10">
+                <path fill="#24272a"
+                      d="M.253.3C.355.15.457.05.558 0l.204.45c.764.65 2.445 2.05 5.043 4.15C8.454 6.7 9.83 7.75 9.931 7.75c.459-.05 1.12-.35 1.885-1 .815-.6 1.579-1.35 2.394-2.25.866-.9 1.68-1.75 2.547-2.45.815-.75 1.528-1.2 2.037-1.35l.306.65c0 .2-.102.45-.306.7-.05.2-.254.4-.458.55-.051.05-.306.2-.713.45l-.51.35c-.407.25-1.07.9-2.088 1.9l-1.07 1-1.986 1.85C11 9.05 10.44 9.5 10.186 9.5c-.255 0-.662-.25-1.12-.85-.51-.6-.816-.95-1.02-1.05l-.713-.55c-.305-.3-.51-.45-.611-.45L1.475 2.5l-1.222-1-.102-.4L.1.75C.1.6.15.45.253.3z" />
+              </svg>
+              <span>SORT</span>
+            </a>
+          </li>
+        </ul>
+        <div class="cm-filter-main all-filter">          
+          <div class="cm-fl-inner has_parent" id="filterList">
+            <div class="tabs-nav head-nav">
+              <ul class="tabs">
+                {%- for filter in collection.filters -%}
+                <li class="tab-link {% if forloop.first %}current{% endif %}" data-tab="{{ filter.label | handleize }}">
+                  <a>{{ filter.label }}</a>
+                </li>
+                {%- endfor -%}                
+              </ul>              
+            </div>
+            {%- for filter in collection.filters -%}            
+            <div id="{{ filter.label | handleize }}" class="tab-content {% if forloop.first %}current{% endif %}">
+              <div class="filter-select">
+                {% case filter.type %}
+                {% when 'list' %}
+                <ul>
+                  {% for val in filter.values %}                  
+                  <li>
+                    <a class="collection_filter {% if val.active %}selected{% endif %}" data-href="{{ val.param_name }}" data-collectionFilter value="{{ val.value }}">{{ val.label }} ({{ val.count }})</a>                   
+                  </li>
+                  {% endfor %}                  
+                </ul>            
+                {% when 'price_range' %}
+                <div class="price_range">
+                  <h2>The highest price is {{ filter.range_max | money }}</h2>
+                  <div>
+                    
+          <input class="filterhasPrice" 
+                           type="number" 
+                           {%- if filter.min_value.value -%}
+                           value="{{ filter.min_value.value | money_without_currency }}"
+                           {%- endif -%}
+                           data-href="{{ filter.min_value.param_name }}" 
+                           placeholder="Min price" min="0" 
+                           data-price-filter
+                           max="{{ filter.range_max | money_without_currency | replace: ',', '' }}">
+                    <input class="filterhasPrice" 
+                           type="number"
+                           {%- if filter.max_value.value -%}
+                           value="{{ filter.max_value.value | money_without_currency }}"
+                           {%- endif -%}
+                           data-href="{{ filter.max_value.param_name }}" 
+                           data-price-filter
+                           placeholder="Max price" min="0" max="{{ filter.range_max | money_without_currency | replace: ',', '' }}">
+                  </div>
+                </div>
+                {% endcase %}
+              </div>
+            </div>            
+            {%- endfor -%}            
+            <div class="current_filter">
+              {%- for filter in collection.filters -%}
+              {% for c_val in filter.active_values %}
+                <a class="collection_filter" data-collectionFilter data-href="{{ c_val.param_name }}" value="{{ c_val.value }}">{{ c_val.label }} &nbsp;X</a>                   
+              {% endfor %}
+              {% if filter.type == "price_range" %}              
+                {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                  <a class="collection_fil_pr" data-href="{{ c_val.param_name }}" value="{{ c_val.value }}" data-activepriceFilter>
+                    {%- if filter.min_value.value -%}{{ filter.min_value.value | money }}{%- else -%}{{ 0 | money }}{%- endif -%}&nbsp;-&nbsp; {%- if filter.max_value.value -%}{{ filter.max_value.value | money }}{%- else -%}{{ filter.range_max | money }}{%- endif -%} &nbsp;X
+                  </a>
+                {%- endif -%}              
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>  
+        <div class="cm-filter-main cm-sort-filter">
+          <ul>
+            {%- for option in collection.sort_options -%}
+            {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+            <li>
+              <a href="javascript:void(0)" data-value="{{ option.value | escape }}" {% if option.value == sort_by %} class="selected"{% endif %} data-collectionSortby>{{ option.name | escape }}</a>
+            </li>
+            {% endfor %}            
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="product-wrapper" id="CollectionProductGrid" data-collectionWPgrid>
+    {%- paginate collection.products by 8 -%}
+    <div class="cs-container">
+      <div class="filter_loader">
+        <img src="https://cdn.shopify.com/s/files/1/0580/9707/4342/files/loading-gif-png-5.gif?v=1628855080" alt="Loader">
+      </div>
+    {% if collection.products_count > 0 %}      
+      <div class="products_item">
+        {% for product in collection.products %}
+        <div class="product-card">
+          <div class="pr-img-wrapper">
+            <a href="{{ product.url }}">
+              <img src="{{ product.featured_image | img_url:'master' }}" alt="Product Image">              
+            </a>
+          </div>
+          <div class="pr-details">
+            <div class="product-name-price">
+              <h4>
+                <a href="{{ product.url }}">
+                  {{ product.title }}
+                </a>
+              </h4>
+              <h3>{{ product.price | money }}</h3>
+            </div>            
+          </div>                    
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="err_msg">No more products in this collection..!</p>
+      {% endif %}
+      {{ paginate | default_pagination: next: 'Older', previous: 'Newer' }}
+    </div>    
+    {%- endpaginate -%}
+  </section> 
+  <script>
+    $(document).ready(function(){ 
+      var data_collectionFilter = '[data-collectionFilter]';
+      var data_filter = '[data-price-filter]';
+      var data_activepriceFilter = '[data-activepriceFilter]';
+      var data_collectionWPgrid = '[data-collectionWPgrid]';
+      var data_collectionSortby = '[data-collectionSortby]';
+      
+      function returnRefinedURL (key, url) {
+        var urlParts = url.split('?');
+        if (urlParts.length === 1 || url.indexOf(key) === -1 ) {
+          return url;
+        }else {
+          var keyValues = urlParts[1].split('&'),
+              refinedKeyValues = keyValues.filter(function (keyValuePair) {
+                return keyValuePair.indexOf(key) !== 0;
+              }).join('&');
+        }
+        if(refinedKeyValues == ''){
+          return urlParts[0]; 
+        }else{
+          return urlParts[0] + '?' + refinedKeyValues; 
+        }        
+      }
+      function getd(currentURL){
+        $.get(currentURL, function( data ) {          
+          window.history.replaceState(null, null, currentURL);          
+          var newchtml = $(data).find('#filterList .filter-select').each(function(i,v){              
+            $('#filterList .filter-select:eq('+i+')').html($(this).html());
+          });                     
+          $('body').find('.current_filter').html($(data).find('.current_filter').html());
+          $('body').find('.cm-sort-filter').html($(data).find('.cm-sort-filter').html());
+          $('body').find(data_collectionWPgrid).html($(data).find(data_collectionWPgrid).html());
+          $('body').removeClass('has_loader');
+        });
+      }
+      var typingTimer;                //timer identifier
+      var doneTypingInterval = 1500;  //time in ms, 5 second for example
+      $('body').on('keydown',data_filter,function(e){  
+        var max = parseInt($(this).attr('max'));
+        var val = $(this).val();
+        var charCode = (e.which) ? e.which : e.keyCode;
+        $('.outerr').remove();
+        if ((charCode > 8 && charCode < 20) ) {          
+          e.preventDefault();          
+          return false;
+        } 
+        clearTimeout(typingTimer);
+      });
+
+      $('body').on('keyup',data_filter,function(e){
+        var max = parseInt($(this).attr('max'));
+        var _this = $(this);
+        var href = _this.data('href');
+        var val = _this.val();        
+        var charCode = (e.which) ? e.which : e.keyCode;        
+        $('.outerr').remove();
+        if ((charCode > 8 && charCode < 20)) {
+          e.preventDefault();          
+          return false;          
+        }                
+        if(parseInt(val) > max){
+          $(this).parent().after('<p class="outerr" style="color: red;">Please add below the number of max price.</p>');
+          e.preventDefault();          
+          return false;
+        }
+        typingTimer = setTimeout(function(){
+          $('body').addClass('has_loader');
+          if(val != undefined && val != ''){          
+            if(val.indexOf(' ') >= 0){
+              val = val.replace(' ','+');
+            }
+            var finalVAL = href+'='+val;     
+            var currentURL = window.location.href;
+            currentURL = returnRefinedURL (encodeURI(href), currentURL);
+            if(currentURL.indexOf('?') >= 0){
+              currentURL = currentURL + '&' + finalVAL;
+            }else{
+              currentURL = currentURL + '?' + finalVAL;
+            } 
+            getd(currentURL);                     
+          }else{
+            var currentURL = window.location.href;
+            currentURL = returnRefinedURL (encodeURI(href), currentURL);
+            getd(currentURL);
+          }
+        }, doneTypingInterval);         
+      });
+      
+      $('body').on('click',data_activepriceFilter,function(){
+        var currentURL = window.location.href;
+        var prarr = ['filter.v.price.gte','filter.v.price.lte'];
+        for(var i=0;i<2;i++){
+          if(currentURL.indexOf(prarr[i]) >= 0){
+            currentURL = returnRefinedURL (encodeURI(prarr[i]), currentURL);
+          }
+        }
+        getd(currentURL);
+      });
+
+      $('body').on('click',data_collectionSortby,function(e){
+        e.preventDefault();
+        $('body').addClass('has_loader');
+        var Oval = $(this).data('value');
+        var sval = 'sort_by='+$(this).data('value');
+        var currentSURL = window.location.href; 
+        if(currentSURL.indexOf('sort_by=') >= 0){
+          if(currentSURL.indexOf(sval) >= 0){
+            currentSURL = returnRefinedURL (sval, currentSURL);
+          }else{            
+            var href = new URL(currentSURL);   
+            href.searchParams.set('sort_by', Oval); 
+            currentSURL = href.toString();            
+          }
+        }else{
+          if(currentSURL.indexOf('?') >= 0){
+            currentSURL = currentSURL + '&' + sval;
+          }else{
+            currentSURL = currentSURL + '?' + sval;
+          } 
+        }                  
+        getd(currentSURL);
+      });
+      
+      $('body').on('click',data_collectionFilter,function(e){
+        e.preventDefault();
+        $('body').addClass('has_loader');
+        var href = $(this).data('href');
+        var val = $(this).attr('value');
+        if(val != undefined && val != ''){
+          if(val.indexOf(' ') >= 0){
+            val = val.replaceAll(' ','+');
+          }
+          var currentURL = window.location.href;
+          var finalVAL = href+'='+val;
+      var is_current = false;
+          var without_cur = [];
+          var params = {};
+          var parser = document.createElement('a');
+          parser.href = window.location.href;
+          var query = parser.search.substring(1);
+          var vars = query.split('&');
+          for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            if(encodeURI(href) == pair[0] && val == pair[1]){
+              is_current = true;
+            }else{
+        without_cur.push(pair[0] + '=' + pair[1]);
+            }
+          }
+          if(is_current){            
+            currentURL = (currentURL.indexOf('?') > -1) ? currentURL.split('?')[0] : currentURL;
+            if(without_cur.length > 0){
+              currentURL = currentURL + '?' +without_cur.join('&')
+            }else{              
+              currentURL = currentURL;
+            }            
+          }else{
+            if(currentURL.indexOf('?') >= 0){
+              currentURL = currentURL + '&' + finalVAL;
+            }else{
+              currentURL = currentURL + '?' + finalVAL;
+            } 
+          }         
+          getd(currentURL);          
+        }
+      });
+    });
+  </script>
+</div>

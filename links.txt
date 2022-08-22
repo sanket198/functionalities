@@ -1,0 +1,143 @@
+//google tracking code
+https://help.shopify.com/en/manual/promoting-marketing/analyze-marketing/tracking-adwords-conversions
+
+//shipping estimate
+https://www.huratips.com/tech-tips/add-a-shipping-rates-calculator-to-your-shopify-cart.html
+
+//email template objects
+https://help.shopify.com/en/manual/sell-online/notifications/email-variables
+
+//liquid code example
+https://shopify.github.io/liquid-code-examples/
+
+//swatch
+https://help.shopify.com/en/themes/customization/products/features/add-color-swatches
+
+//customize order page
+https://help.shopify.com/en/manual/orders/status-tracking/customize-status-tracking
+
+//cart attribute to collect more info.
+https://help.shopify.com/en/themes/customization/cart/get-more-information-with-cart-attributes
+
+//link product option
+https://help.shopify.com/en/themes/customization/products/variants/link-product-options-in-menus
+
+//get customize info. for product
+https://help.shopify.com/en/themes/customization/products/features/get-customization-information-for-products#show-customizations-in-the-cart-sectioned-themes-specific
+
+//add field in customer registration
+https://help.shopify.com/en/themes/customization/forms/get-more-information-with-customer-registration-form#types-of-form-fields
+
+//shipping calculator
+https://help.shopify.com/en/themes/customization/cart/add-shipping-calculator 
+
+//metafields
+https://help.shopify.com/en/themes/liquid/objects/metafield
+
+//group by filters
+https://gist.github.com/darryn/8047749
+
+//for tag filter
+https://sumankc.com/2017/04/01/shopify-blog-sidebar-categories-tags-and-archives/
+
+//instafeed
+http://instafeedjs.com/
+
+//twitterfeed
+https://help.twitter.com/en/using-twitter/embed-twitter-feed
+
+//timer js
+https://albert-gonzalez.github.io/easytimer.js/
+http://flipclockjs.com/
+
+//magic zoom
+https://www.shopify.in/partners/blog/jquery-image-zoom
+
+//magiczoom settings
+https://www.magictoolbox.com/magiczoom/integration/#api
+
+//git through command
+https://git-scm.com/book/en/v2
+
+//buy button
+https://help.shopify.com/en/themes/customization/cart/use-permalinks-to-preload-cart
+
+//auto complete search
+https://www.huratips.com/tech-tips/how-to-add-autocomplete-for-search-boxes-to-your-shopify-store.html
+http://unofficialshopify.blogspot.com/2016/09/how-to-enable-autocomplete-for-search.html
+
+//create or get cookies
+https://www.w3schools.com/js/tryit.asp?filename=tryjs_cookie_username
+
+//line item product property
+https://ui-elements-generator.myshopify.com/pages/line-item-property
+
+//next-prev without using collection
+https://community.shopify.com/c/Shopify-Design/Previous-and-Next-button-bug/m-p/293817
+
+//forms
+https://help.shopify.com/en/themes/liquid/tags/theme-tags#currency-form
+
+//currency switcher
+https://help.shopify.com/en/themes/customization/currencies
+http://docs.minionmade.com/shopify/add-currency-converter-to-shopify-website
+
+//jquery ui slider(range)
+https://jqueryui.com/slider/#range
+
+//range slider css
+https://www.cssportal.com/style-input-range/
+
+//google product rating description schema
+https://schema.org/
+
+//pick up options option
+https://help.shopify.com/en/themes/customization/products/variants/how-to-add-a-pick-an-option-to-drop-downs
+
+//open graph meta tags
+https://neilpatel.com/blog/open-graph-meta-tags/
+
+//html description
+https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTMLhttps://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/The_head_metadata_in_HTML
+
+//arrows codes
+https://www.alt-codes.net/arrow_alt_codes.php
+
+//facebook debugger
+https://developers.facebook.com/tools/debug/
+
+//disable right click
+https://mycyberuniverse.com/developing/disabling-right-clicking-by-using-javascript.html
+https://medium.com/@maheshkariya/disable-ctrl-key-right-click-and-f12-7617bb7f2e87
+
+//select variants by clicking images
+https://help.shopify.com/en/themes/customization/products/variants/select-variants-by-clicking-images
+
+//change number of product per page
+https://medium.com/@hiennv/how-to-change-number-of-product-per-page-in-shopify-83f2c4e4a7c0
+
+//google recaptcha
+https://www.google.com/recaptcha/intro/v3.html
+
+//lazyload
+https://afarkas.github.io/lazysizes/
+
+//google calendar embed
+https://support.google.com/calendar/answer/41207?hl=en
+
+//google search
+https://cse.google.co.in/cse/lookandfeel/layout?cx=006196878061625361235:1jwo2j6mdze
+
+//add lazyload
+https://speedboostr.com/shopify-lazy-loading/
+
+//auto search
+https://help.shopify.com/en/themes/development/search/predictive-search
+
+//change input type file placeholder
+http://jsfiddle.net/ZDgRG/
+
+//new checkout upgrade
+https://help.shopify.com/en/manual/checkout-settings/checkout-upgrade?mkt_tok=eyJpIjoiTW1NME1qa3lZVGswWm1VMCIsInQiOiI4a1NMdU8zVEFlK0dPU0owVVVJZnpFNVpQNDVxcGVza2VoSTF5b1BpbWFWcHZGdDUzNUs5Wk53cUl0b3FrMjAwWkVBV1JzeHNcL3kxNEo2N2NmVHpNNW1saVY4QU9LYkQrZXJib1dXRVM2RkJqeVNJWkFuUFNVRHVwT1hPNjFZRXoifQ%3D%3D
+https://help.shopify.com/en/manual/checkout-settings/checkout-upgrade#subscriptions
+https://shopify.dev/docs/themes/theme-templates/checkout-liquid?shpxid=47385618-3C58-4A06-C92E-57FBAE6B7C23#step-identification

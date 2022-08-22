@@ -1,0 +1,57 @@
+collection-template.liquid
+{% paginate collection.products by 20 %}
+<ul class="collection-matrix">
+ {% for product in collection.products %}
+ <li id="product-{{ forloop.index | plus:paginate.current_offset }}">
+  {% include 'product' with product %}
+ </li> 
+ {% endfor %}
+ <li class="top"><a href="#collectionpage">Back to Top</a> &uarr;</li>        
+ {% if paginate.next %}
+  <li class="more">&darr; <a href="{{ paginate.next.url }}">More</a></li>        
+ {% endif %}
+</ul>
+<div id="product-list-foot"></div>
+{% endpaginate %}
+
+theme.js
+var pInfScrLoading = false;
+var pInfScrDelay = 100;
+
+function pInfScrExecute() {
+  if($(document).height() - 800 < ($(document).scrollTop() + $(window).height())) {
+    var loadingImage;
+    pInfScrNode = $('.more').last();	
+    pInfScrURL = $('.more a').last().attr("href");
+    if(!pInfScrLoading && pInfScrNode.length > 0 && pInfScrNode.css('display') != 'none') {
+      $.ajax({
+        type: 'GET',
+        url: pInfScrURL,
+        beforeSend: function() {
+          pInfScrLoading = true;
+          loadingImage = pInfScrNode.clone().empty().append('<img src=\"http://cdn.shopify.com/s/files/1/0068/2162/assets/loading.gif?105791\" />');
+          loadingImage.insertAfter(pInfScrNode);
+          pInfScrNode.hide();
+        },
+        success: function(data) {
+          // remove loading feedback
+          pInfScrNode.next().remove();
+          var filteredData = $(data).find(".collection-matrix");
+          filteredData.insertBefore( $("#product-list-foot") );
+          loadingImage.remove();					
+          pInfScrLoading = false;
+        },
+        dataType: "html"
+      });
+    }
+  }
+}
+$(document).ready(function () {
+  $(window).scroll(function(){
+    $.doTimeout( 'scroll', pInfScrDelay, pInfScrExecute);
+    if( $(document).height() - 800 > $(document).scrollTop() + $(window).height() ) {
+      pInfScrDelay = 100;
+    }
+  });
+});
+// https://github.com/cowboy/jquery-dotimeout

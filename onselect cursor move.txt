@@ -1,0 +1,20 @@
+$( document ).ready(function() {
+  if (window.location.href.indexOf('?col=') > 0) {
+    function getUrlVars()    {
+      var vars = [], hash;
+      var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+      for(var i = 0; i < hashes.length; i++)       {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+      }
+      return vars;
+    }
+
+    var first = getUrlVars()["col"];
+    var mydata = first.split("%20");
+    var myparavalue = mydata.join(" ");
+    myparavalue = myparavalue.replace(/_/g, '&');
+    $('.support-list#'+myparavalue).trigger('click');
+  }
+});

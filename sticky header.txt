@@ -1,0 +1,61 @@
+//stickey header
+
+
+<script>
+  $(function(){
+    
+    var width = $(window).width();
+    if (width < 991){
+      createSticky($(".menu-section"));
+    }else{
+      createSticky($(".uniq"));
+    }
+
+  });
+
+  function createSticky(sticky) {
+
+    if (typeof sticky !== "undefined") {
+
+      var	pos = sticky.offset().top + 30,
+          win = $(window);
+
+      win.on("scroll", function() {
+        win.scrollTop() >= pos ? sticky.addClass("fixed") : sticky.removeClass("fixed");      
+      });			
+    }
+} 
+</script>
+<style>
+.fixed {
+  position: fixed !important;
+  top: 0; 
+  left: 0px;
+  right: 0px;	
+}
+</style>
+
+//hide and show header
+
+<script>
+var prevScrollpos = window.pageYOffset;
+window.onscroll = function() {
+var currentScrollPos = window.pageYOffset;
+  if (prevScrollpos > currentScrollPos) {
+    document.getElementById("navbar").style.top = "0";
+  } else {
+    document.getElementById("navbar").style.top = "-50px";
+  }
+  prevScrollpos = currentScrollPos;
+}
+</script>
+
+
+#navbar {
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: block;
+  transition: top 0.3s;
+}

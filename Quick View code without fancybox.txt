@@ -1,0 +1,346 @@
+1..Put this in product tmplt where you want to display quick view
+
+{% if section.settings.qv %}
+                <div class="view overlayBtnOuter">
+                  <a class="btn-d addToCart openQv hideOnMob" href="{{product.url}}?view=quick_view">qv</a>
+                </div>
+                {% endif %}
+2..in theme.liquid paste following code
+  <div class="popupOverlay qvPopup" style="display:none">
+    <div class="popupBox slideInDown animated">
+      <a class="cls_popup" style="color:#000;float:right;cursor:pointer;">X</a>
+      <div id="qvProductContent" class="qvProduct">
+      </div>
+    </div>
+  </div>
+3..In theme.js paste following code
+
+	function closePopup() {
+  $('.popupBox').removeClass('slideInDown');
+  $('.popupBox').addClass('slideOutUp');
+  $('.popupOverlay').fadeOut('slow');
+}
+
+function openPopup(a) {
+  $('.popupBox').addClass('slideInDown');
+  $('.popupBox').removeClass('slideOutUp');
+  $('.popupOverlay.'+a).fadeIn('slow');
+}
+$('body').on('click','.popupinfo',function(e){
+  e.preventDefault();
+  var id = $(this).data('href');
+  openPopup(id);
+});
+$('body').on('click','.cls_popup',function(e){
+  e.preventDefault();
+  closePopup();
+});
+$(document).keyup(function(e) {
+  if (e.keyCode == 27) { 
+    closePopup();
+  }
+});
+window.onclick = function(e) {
+  if ($(e.target).hasClass('popupOverlay')) {
+    closePopup();
+  }
+}
+$('.openQv').on('click', function(e){
+  $(this).attr('disabled','disabled');
+  $('.qvProduct').removeAttr('style');
+  var url = $(this).attr("href");
+  e.preventDefault();
+  $.get( url, function( data ) {
+    $('#qvProductContent').html(data);
+    openPopup('qvPopup');
+    $('.puList').slick({
+      slidesToShow: 2,
+      slidesToScroll: 1,
+      infinite: false
+    });
+
+    $('.qv_main').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false,
+      fade: true,
+      asNavFor: '.qv_thumb'
+    });
+    $('.qv_thumb').slick({
+      slidesToShow: 2,
+      slidesToScroll: 1,
+      asNavFor: '.qv_main',
+      dots: false,
+      focusOnSelect: true,
+      arrows: true,
+    });
+
+    $('.addtocartForm').on('submit', function(e){
+      e.preventDefault();
+      $('#AddToCart').attr('disabled');
+      $('#AddToCart span').text('Adding..');
+      var form = $(this);
+      $('.puadd:checked').each(function(){
+        var id = $(this).attr('data-id');
+        $.ajax({
+          url: '/cart/add.js',
+          data: { id: id },
+          type: 'POST',
+          dataType: 'json',
+          async:false
+        });
+      });
+      $.ajax({
+        url: '/cart/add.js',
+        data: form.serialize(),
+        type: 'POST',
+        dataType: 'json',
+        async:false,
+        success: function(){
+          $('#AddToCart').removeAttr('disabled');
+          $('#AddToCart span').text('Added.');
+          closePopup();
+          addToCartSuccess();
+          $.getJSON('/cart.js', function(cart){
+            refreshCart(cart);
+          });
+          $('.productGrid .productItem').removeClass('qvopen');
+          $('body').addClass('cartOpen');
+          $('.fullPage').addClass('witmenu');
+        }
+      });
+    });
+
+  });
+  $('.openQv').removeAttr('disabled');
+});
+
+4..Create new Product template and paste following code
+
+	{% layout none %}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+<div id="product" class="pro_{{ product.handle }}">
+  <div class="product-del-cols clearboth">
+    <div class="product-img ">
+      {% if product.featured_image %}
+        <div class="product-main-slider clearboth qv_main"> 
+            <img src="{{ product.featured_image | img_url: '1024x1024' }}" alt="{{product.title}}" />
+        </div>
+      {% endif %}
+    </div>
+    <div class="product-del">
+      <form action="/cart/add" class="addtocartForm" data-productid="{{product.id}}" method="post"> 
+        <h1>{{product.title}}</h1><br/>
+        <div class="productReview pro-rev">
+          <div class="item-reviews" data-product-id="{{product.id}}"></div>
+        </div><br/>
+        <h3 class="product-single__price product-single__price-{{ section.id }}{% unless current_variant.available %} product-price--sold-out{% endunless %}">
+          {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="product-price__price product-price__price-{{ section.id }} product-price__sale product-price__sale--single">
+            <span id="ProductPrice"
+                  itemprop="price" content="{{ current_variant.price | divided_by: 100.00 }}">
+              {{ current_variant.price | money }}
+            </span>
+          </span>
+          <del id="ComparePrice">{{ current_variant.compare_at_price | money }}</del>
+          {% else %}
+          <span class="product-price__price product-price__price-{{ section.id }}">
+            <span id="ProductPrice"
+                  itemprop="price" content="{{ current_variant.price | divided_by: 100.00 }}">
+              {{ current_variant.price | money }}
+            </span>
+          </span>
+          <del id="ComparePrice" class="hide">{{ current_variant.compare_at_price | money }}</del>
+          {% endif %}
+        </h3>
+
+        <p class="stockStatus clr-green">{% if current_variant.available %}InStock{% else %}Sold out{% endif %}</p>
+        <div class="more">
+            {{ product.description }}
+        </div>
+        
+          <div class="productOPtoins clearboth customDesignSelect productoptionsize{{product.options.size}}"{% if hide_default_title %} style="display:none"{% endif %} >
+            {% if product.variants.size > 1 %}
+            <select id="productSelect" name="id" data-productid="{{product.id }}"  style="display:none" >
+              {% for variant in product.variants %}
+              <option value="{{ variant.id }}"{% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %}>{{ variant.title }} - {{ variant.price | money }}</option>
+              {% endfor %}
+            </select>
+            {% else %}
+            <input type="hidden" value="{{ current_variant.id }}" name="id" />
+            {% endif %}
+            <div class="quantityProductOuter">
+            <div class="qty-box">
+              <label>Quantity</label>
+              <select name="quantity">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+          </div>
+          
+        <div class="cart-secs pro-btn productformOuter clearboth">
+          <button style="margin-top:20px;background: #e33b3f;color: #fff;font-size: 14px;text-shadow: none;padding: 7px 18px;text-shadow: none;border: 1px solid #f7746d;cursor:pointer;" type="submit" name="add" id="AddToCart" {% unless current_variant.available %}disabled="disabled"{% endunless %} class="addtocart btn-d btn02{% if product.options.size == 1 and product.variants[0].title == 'Default Title' %} product-form__cart-submit--small{% endif %}">
+            {% unless current_variant.available %}
+            <span>Sold out</span>
+            {% else %}
+            <span>ADD TO CART</span>
+            {% endunless %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% if product.variants.size > 1 %}
+<script>
+  var selectCallback = function(variant, selector) {
+    event.preventDefault();
+    var mf = "{{ shop.money_format }}";
+
+    if (variant && variant.available) {
+      jQuery('#AddToCart').removeAttr('disabled').removeClass('disabled').find('span').text('ADD TO CART'); 
+      jQuery('.stockStatus').html('<br/>InStock<br/>');
+      if(variant.price < variant.compare_at_price){
+        jQuery('#ProductPrice').html(Shopify.formatMoney(variant.price, mf));
+        $('ComparePrice').html(Shopify.formatMoney(variant.compare_at_price, mf));
+      } else {
+        jQuery('#ProductPrice').html(Shopify.formatMoney(variant.price, mf));
+      }
+    } else {
+      jQuery('#AddToCart').addClass('disabled').attr('disabled', 'disabled').find('span').text('Sold out'); 
+      var message = variant ? 'Sold out' : 'Unavailable';
+      jQuery('.stockStatus').html(message);
+    }
+	
+    
+    if(variant && variant.featured_image) {
+      if($('.product-img .product-feacture-slider').length) {
+        if($('.product-img .product-feacture-slider').hasClass('slick-initialized')) {
+          var pts = Shopify.resizeImage(variant.featured_image.src,'medium');
+          var ti = $('.inner-slider[data-src="'+pts+'"]').index();
+          console.log(ti);
+          $('.product-img .product-feacture-slider').slick('slickGoTo', ti);
+        }
+      }
+    }
+
+  };
+
+  jQuery(document).ready(function(jQuery){
+    event.preventDefault();
+    new Shopify.OptionSelectors("productSelect", { product: {{ product | json }}, onVariantSelected: selectCallback, enableHistoryState: false });
+
+    {% if product.options.size == 1 and product.options.first != 'Title' %}
+    jQuery('.selector-wrapper:eq(0)').prepend('<label>{{ product.options.first | escape }}</label>');
+	{% endif %}                                       
+	});
+</script>
+{% endif %}
+
+5...Add css
+
+//---------------quickview------------//
+  .qvPopup .popupBox {
+    max-width: 800px;
+    margin: 0 auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    background-color: #FFF;
+    padding: 15px;
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+}
+.popupOverlay.qvPopup {
+    position: fixed;
+    z-index: 99999;
+    background: rgba(0,0,0,0.5);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.qvPopup .popupBox {
+  max-width: 800px;
+}
+.qvProduct .product-del-cols {
+  margin: 0;
+}
+.qvProduct .product-del-cols .product-img, .qvProduct .product-del-cols .product-del {
+  padding: 0;
+  width: 50%;
+  float: left;
+}
+.qvProduct .product-del-cols .product-del { 
+  padding-left: 20px;
+}
+.cart-secs #AddToCart {
+  float: left;
+  width: 80%;
+}
+.cart-secs .wk-add-product {
+  width: calc(20% - 10px);
+  float: left;
+  margin: 0 0 0 10px !important;
+  background: #eee;
+  padding: 5px 0;
+  border: 2px solid #eee;
+  height: 38px;
+}
+.customDesignSelect {
+  margin:0 -10px;
+}
+.customDesignSelect .selector-wrapper {
+  float:left;
+  padding:0 10px;
+}
+.productoptionsize2.customDesignSelect .selector-wrapper {
+  width:50%;	
+}
+.productoptionsize1.customDesignSelect .selector-wrapper,
+.productoptionsize3.customDesignSelect .selector-wrapper {
+  width:50%;	
+}
+.productoptionsize3.customDesignSelect .quantityProductOuter,
+.productoptionsize1.customDesignSelect .quantityProductOuter {
+  float:left;
+  width:50%;
+  clear:none;
+  padding-top:0;
+}
+.customDesignSelect .selector-wrapper label, .quantityProductOuter label {
+  display:block;
+  text-transform:uppercase;
+  font-size: 11px;
+  margin-bottom: 4px;
+  font-weight:600;
+}
+/* select {
+  border:1px solid #ddd;
+  padding-top:10px;
+  padding-bottom:10px;
+  padding-left:10px;
+  outline:none !important;
+  font-size: 14px;
+} */
+.customDesignSelect .selector-wrapper select, .quantityProductOuter select {
+  width:100%;
+}
+.quantityProductOuter {
+  padding:10px 10px 0;
+  clear:both;
+}
+.morecontent span {
+    display: none;
+}
+.morelink {
+    display: block;
+}
+//---------------end of quickview------------//

@@ -1,0 +1,21 @@
+$('body').on('click','.inc-dec',function(e){
+    e.preventDefault();
+    var val = $(this).val().toLowerCase();    
+    if( val == '+'){
+		var pval = $(this).next().val();
+      	$(this).next().val(Number(pval)+Number(1));
+    }else{
+      var pval = $(this).prev().val();
+      if( pval > 0 ){
+		$(this).prev().val(Number(pval)-Number(1));	
+      }else{
+        $(this).prev().val('0');
+      }
+    }
+    $()
+  });
+
+
+<button class="inc-dec" value="+">+</button>
+<input type="text" name="updates[]" class="justselect" min="0" id="updates_{{ item.id }}" value="{{ cart_pro.quantity }}"  pattern="[0-9]*"/>
+<button class="inc-dec" value="-">-</button>

@@ -1,0 +1,44 @@
+//////////// add class in different devices ////////////
+
+if(navigator.appVersion.indexOf("Win")!=-1) {
+  jQuery('body').addClass('window-os');
+}
+if(navigator.platform.toUpperCase().indexOf('MAC')>=0) {
+  jQuery('body').addClass('mac-os');
+}
+// Opera 8.0+
+var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+// Firefox 1.0+
+var isFirefox = typeof InstallTrigger !== 'undefined';
+// Safari 3.0+ "[object HTMLElementConstructor]"
+var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+// Internet Explorer 6-11
+var isIE = /*@cc_on!@*/false || !!document.documentMode;
+// Edge 20+
+var isEdge = !isIE && !!window.StyleMedia;
+// Chrome 1 - 71
+var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+// Blink engine detection
+var isBlink = (isChrome || isOpera) && !!window.CSS;
+var output = 'Detecting browsers by ducktyping:<hr>';
+if(isFirefox){
+  jQuery('body').addClass('isFirefox');
+}
+if(isChrome) {
+  jQuery('body').addClass('isChrome');
+}
+if(isSafari) {
+  jQuery('body').addClass('isSafari');
+}
+if(isIE) {
+  jQuery('body').addClass('isIE');
+}
+if(isEdge) {
+  jQuery('body').addClass('isEdge');
+}
+if(isOpera) {
+  jQuery('body').addClass('isOpera');
+}
+if(isBlink) {
+  jQuery('body').addClass('isBlink');
+}

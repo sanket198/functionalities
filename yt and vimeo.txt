@@ -1,0 +1,45 @@
+Html:
+
+<div class="top_banner_video {% if section.settings.vtype == 'youtube' %}youtube_video{% endif %}{% if section.settings.vtype == 'vimeo' %}vimeo_video{% endif %}{% if section.settings.vtype == 'html' %}hvideo_video{% endif %}">
+          {% if section.settings.vtype == 'html' %}
+          <video controls id="video_{{ forloop.index }}" class="slide-video slide-media" preload="metadata" {% if section.settings.slide_image %}poster="{{ section.settings.slide_image | img_url : 'master' }}"{% endif %} >
+            <source src="{{ section.settings.fram_url }}" type="video/mp4" />
+          </video>
+          {% elsif section.settings.vtype == 'vimeo' %}
+          <iframe class="embed-player slide-media" src="https://player.vimeo.com/video/{{ section.settings.fram_url }}?mute=1&loop=1&id={{ section.settings.fram_url }}" width="980" height="520" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+          {% else %}
+          <iframe id="video_{{ forloop.index }}" class="embed-player slide-media" width="980" height="520" src="https://www.youtube.com/embed/{{ section.settings.fram_url }}?autoplay=1&mute=1&enablejsapi=1&controls=0&fs=0&iv_load_policy=3&rel=0&showinfo=0&loop=1&playlist={{ section.settings.fram_url }}&playsinline=1&modestbranding=1&branding=0&autohide=0&cc_load_policy=0&wmode=opaque&playlist={{ section.settings.fram_url }}" frameborder="0" wmode="opaque"  allow="autoplay; encrypted-media"></iframe> 
+          {% endif %}           
+        </div>
+
+
+For skip the video for the seconds use thi at the end of the url in iframe:
+&#t=235s
+
+Setttings:
+
+{
+      "type": "select",
+      "id": "vtype",
+      "label": "Video type",
+      "options": [
+        {
+          "value": "html",
+          "label": "mp4 video"
+        },
+        {
+          "value": "youtube",
+          "label": "youtube video"
+        },
+        {
+          "value":"vimeo",
+          "label":"Vimeo"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "fram_url",
+      "label": "Video URL",
+      "info": "If youtube or vimeo video, put video ID only"
+    }

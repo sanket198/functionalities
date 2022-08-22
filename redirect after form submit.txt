@@ -1,0 +1,11 @@
+<script>
+  $(document).ready(function(){
+    var $returnTo = $('<input type="hidden" name="return_to" value="WHERE_YOU_WANT_TO_REDIRECT" />');
+
+    if ($('#create_customer').length > 0){ //if registration form
+      $returnTo.insertBefore($('#create_customer input[type="submit"]')); // add return_to input
+    } else if ($('#g-recaptcha').length){ //if captcha form
+       $returnTo.insertBefore($('.shopify-challenge__container input[type="submit"]'));
+    }
+  });
+</script> 

@@ -1,0 +1,37 @@
+{% assign sc = collections['accessories'] %}
+            {% for item in cart.items %}
+            {% assign demo = demo | append: item.product.id | append:',' %}
+            {% endfor %} 
+            {% assign count = 0 %}
+            {% for c_product in sc.products  %}
+            {%- unless demo contains  c_product.id  -%}
+            {%- assign count = count | plus: 1 -%}
+            {%- assign current_variant = c_product.selected_or_first_available_variant -%}
+            {% form 'product' ,c_product , class:'product' , data-productid:{{current_variant.id}} %}
+            {%- assign current_variant = c_product.selected_or_first_available_variant -%}
+            <input type="hidden" name="id" value="{{ c_product.variants.first.id }}" />
+            <section class="cProdList">
+              <div class="item csBox flex flexJustifyBetween flexAlignItemsCenter">
+                <div class="flex1 cplThumb"><img src="{{ c_product.featured_image | img_url:'medium' }}" alt="{{ c_product.title }}"></div>
+                <div class="flex2 cplDetail">
+                  <div class="cplName">{{ c_product.title }}</div>
+                  <div class="cplPrice">{{ c_product.price | money }}</div>
+                </div>
+                <!--                                     <div class="flex1 cplAction"><a href="#" class="btn-cart blueLink olNext" data-stepid="cartstep02">Add to cart</a></div> -->
+                <input min="0" type="number" class="p_qty" value="1" id="Quantity" name="quantity">
+                <button class="submit button addtocart cart blueLink olNext" name="add" type="submit" {% unless current_variant.available %}disable{% endunless %}>
+                  <span class="addTocart ajex_add_cart_btn" id="add-to-cart">
+                    {% if current_variant.available %}
+                    Add to cart
+                    {% else %}
+                    Out of stock
+                    {% endif %}
+                  </span>
+                </button>
+              </div>
+            </section>
+            {% endform %}
+            {%- endunless -%}
+            {%- if count == 2 -%}
+            {%- break -%}
+            {%- endif -%}

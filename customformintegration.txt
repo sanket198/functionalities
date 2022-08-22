@@ -1,0 +1,86 @@
+<form class="phone_subscribe">
+            <div class="form-group">
+              <input type="text"
+                     name="phone"
+                     id="footerphone"
+                     class="input_box"
+                     placeholder="Enter your phone number" />
+              <input type="email"
+                     name="contact[email]"
+                     id="footeremail"
+                     class="input_box"
+                     placeholder="Enter your email address" />
+            </div>
+          
+          {% comment %}
+            <div class="extra-info">
+              <p>*Offer valid on full price merchandise only.</p>
+              <!-- Attentive HTML -->
+              <div id="attentiveOptIn" class="fieldset-description" data-buyer-accepts-marketing-attentive="" aria-label="Phone Sign Up">
+                <div class="section__content section__content__attentive">
+                  <div class="checkbox-wrapper">
+                    <div class="checkbox__input">
+                      <input name="attributes[buyer_accepts_marketing_attentive]" type="hidden" value="0">
+                      <input class="input-checkbox" data-backup="buyer_accepts_marketing" type="checkbox" value="1" name="attributes[buyer_accepts_marketing_attentive]" id="checkout_buyer_accepts_marketing_attentive" aria-labelledby="headers" tabindex="0" focusable="true" required>
+                    </div>
+                  </div>
+                </div>
+              </div><br />
+              {% if section.settings.new_extra != blank %}{{ section.settings.new_extra }}{% endif %}
+            </div>
+          {% endcomment %}
+
+          <button type="submit" class="btn cust_btn">SUBSCRIBE</button>
+          <div class="extra-info">
+            <p>*Offer valid on full price merchandise only.</p>
+            <!-- Attentive HTML -->
+          </div>
+        </form>
+
+===============================================================
+
+<script>
+  $(document).ready(function(){
+    $('.phone_subscribe').on('submit',function(e){
+      e.preventDefault();
+      $(this).find('.common_msg').remove();
+      var form = $(this);
+      var phone = form.find('#footerphone').val();
+      if(phone == '' ){  
+        form.append('<p class="common_msg">Please Enter Phone</p>');
+        return false;
+      }
+      var vid = document.cookie.replace(/(?:(?:^|.*;\s*)__attentive_id\s*=\s*([^;]*).*$)|^.*$/, "$1");
+      var settings = {
+        "url": "https://api.attentivemobile.com/1/add-subscribers",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer ZBbwRBFk4T5XPso0LUAzCUTlFBdKP79azHY2acrvFxo",
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify({"phone":phone,"visitorId":vid}),
+
+      };
+
+      $.ajax(settings).done(function (response) {
+        var s = JSON.parse(response);
+        if(s.encodedExternalId) {
+          form.html('<p class="successs_msg">Thanks For Subscribing!</p>');
+        } else {
+          form.append('<p class="common_msg">Please try leter</p>');
+        }
+      }).fail(function(data){
+        form.append('<p class="common_msg">'+data.responseText+'</p>');
+      });
+
+    });
+
+ 
+    $('.menu-cont .menu-title').on('click', function(e){
+      e.preventDefault();
+      $(this).toggleClass('show');
+      $(this).next('ul').slideToggle(700);
+    });
+  })
+</script>

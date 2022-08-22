@@ -1,0 +1,150 @@
+<h1>{{ product.title }}</h1>
+{% assign current_variant = product.selected_or_first_available_variant %}
+<div id="product-{{ product.id }}">
+  {% form 'product', product, novalidate: 'novalidate', class:'custom_link'%}
+  <select name="id" id="ProductSelect-qv" class="product-form__variants no-js">
+    {% for variant in product.variants %}
+    <option value="{{ variant.id }}"
+            {%- if variant == current_variant %} selected="selected" {%- endif -%}>
+      {{ variant.title }}  {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+                </option>
+    {% endfor %}
+  </select>
+  {% if product.available and product.variants.size > 1 %}
+  {% render 'swatch' for product.options as swatch %}
+  {% endif %}
+  <button type="submit" id="add"> 
+    {% if current_variant %}
+    {% if current_variant.available %}
+    Add to cart
+    {% else %}
+    Soldout
+    {% endif %}
+    {% else %}
+    Unavailable
+    {% endif %}
+  </button>
+  <script type="application/json" class="linkcustomJson">
+    {{ product | json }}
+  </script>
+  {% endform %}
+</div>
+<script>
+  var selectCallback_qv = function(variant, selector) {
+    // BEGIN SWATCHES
+    if (variant) {
+      var form = jQuery('#' + selector.domIdPrefix).closest('form');
+      for (var i=0,length=variant.options.length; i<length; i++) {
+        var radioButton = form.find('.swatch[data-option-index="' + i + '"] :radio[value="' + variant.options[i] +'"]');
+        if (radioButton.size()) {
+          radioButton.get(0).checked = true;
+        }
+      }
+    }
+    // END SWATCHES
+    if (variant) {
+      if (variant.available) {
+        // Selected a valid variant that is available.
+        form.find('#add').removeClass('disabled').removeAttr('disabled').val('Add to Cart').fadeTo(200,1);
+        form.find('#add').text('Add to Cart');
+      } else {
+        // Variant is sold out.
+        form.find('#add').val('Sold Out').addClass('disabled').attr('disabled', 'disabled').fadeTo(200,0.5);
+        form.find('#add').text('Sold Out');
+      }
+      // Whether the variant is in stock or not, we can update the price and compare at price.
+      if ( variant.compare_at_price > variant.price ) {
+        form.find('#price-field').html('<span class="product-price on-sale">'+ Shopify.formatMoney(variant.price, "") +'</span>'+'&nbsp;<s class="product-compare-price">'+Shopify.formatMoney(variant.compare_at_price, "")+ '</s>');
+      } else {
+        form.find('#price-field').html('<span class="product-price">'+ Shopify.formatMoney(variant.price, "") + '</span>' );
+      }
+    } else {
+      // variant doesn't exist.
+      form.find('#add').val('Unavailable').addClass('disabled').attr('disabled', 'disabled').fadeTo(200,0.5);
+      form.find('#add').text('Unavailable');
+    }
+  }
+  // initialize multi selector for product
+  jQuery(function($) {
+    new Shopify.OptionSelectors("ProductSelect-qv", { product:  {{ product | json }} , onVariantSelected: selectCallback_qv, enableHistoryState: true });
+  });
+</script>
+
+ 
+
+<script>
+  window.option_list = [];
+  window.update_options = function(position,form,pid) {
+    switch (position) {
+      case 0:
+        var arr_key_val = ['0',form.find('.single-option-selector:eq(0)')]; break;
+      case 1:
+        var arr_key_val = [form.find('.single-option-selector:eq(0)').val(),form.find('.single-option-selector:eq(1)')]; break;
+      case 2:
+        var arr_key_val = [form.find('.single-option-selector:eq(0)').val() + ' / ' + form.find('.single-option-selector:eq(1)').val(),form.find('.single-option-selector:eq(2)')];
+    }
+    var current_val = arr_key_val[1].val();
+    arr_key_val[1].empty();
+    var avl_variants = window.option_list[pid][arr_key_val[0]];
+    for (var i=0; i<avl_variants.length; i++) {
+      arr_key_val[1].append('<option value="'+ avl_variants[i] +'">'+ avl_variants[i] +'</option>');
+    }
+    form.find('.swatch[data-option-index="'+position+'"] .swatch-element').each(function() {
+      (jQuery.inArray($(this).attr('data-value'), avl_variants) !== -1) ? $(this).removeClass('soldout').show().find(':radio').removeAttr('disabled','disabled').removeAttr('checked') : $(this).addClass('soldout').hide().find(':radio').removeAttr('checked').attr('disabled','disabled');
+    });
+    if (jQuery.inArray(current_val, avl_variants) !== -1) {
+      arr_key_val[1].val(current_val);
+    }
+    arr_key_val[1].trigger('change');  
+  };
+  window.get_product_options = function(product,form) {
+    window.option_list[product.id] = [];
+    for (var i=0; i<product.variants.length; i++) {
+      var variant = product.variants[i];
+      if (variant.available) {
+        window.option_list[product.id][0] = window.option_list[product.id][0] || [];
+        window.option_list[product.id][0].push(variant.option1);
+        window.option_list[product.id][0] = Array.from(new Set(window.option_list[product.id][0]));
+        if (product.options.length > 1) {
+          var val = variant.option1;
+          window.option_list[product.id][val] = window.option_list[product.id][val] || [];
+          window.option_list[product.id][val].push(variant.option2);
+          window.option_list[product.id][val] = Array.from(new Set(window.option_list[product.id][val]));
+        }
+        if (product.options.length === 3) {
+          var val = variant.option1 + ' / ' + variant.option2;
+          window.option_list[product.id][val] = window.option_list[product.id][val] || [];
+          window.option_list[product.id][val].push(variant.option3);
+          window.option_list[product.id][val] = Array.from(new Set(window.option_list[product.id][val]));
+        }
+      }
+    }
+    update_options(0,form,product.id);
+    if (product.options.length > 1) update_options(1,form,product.id);
+    if (product.options.length === 3) update_options(2,form,product.id);
+    form.find(".single-option-selector:eq(0)").change(function() {
+      if (product.options.length > 1) update_options(1,form,product.id);
+      if (product.options.length === 3) update_options(2,form,product.id);
+    });
+    form.find(".single-option-selector:eq(1)").change(function() {
+      if (product.options.length === 3) update_options(2,form,product.id);
+    });
+  };
+  window.custom_link_refresh = function() {
+    var all_forms = document.querySelectorAll('form[action="/cart/add"]');
+    for (i = 0; i < all_forms.length; i++) {
+      var form = jQuery(all_forms[i]);
+      if(form.hasClass('custom_link') && form.find('.linkcustomJson').length && form.find('.single-option-selector').length){
+        var productJson = form.find('.linkcustomJson');
+        if (!productJson || !productJson.html().length) return;
+        productJson = JSON.parse(productJson.html())
+        if(productJson.available && typeof window.option_list[productJson.id] === 'undefined'){
+          get_product_options(productJson,form);
+        }
+      }
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    custom_link_refresh();
+  });
+</script>

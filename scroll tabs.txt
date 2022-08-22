@@ -1,0 +1,86 @@
+
+  if($('.nav_scroll').length > 0){
+    function scroll_to(){         
+      $('.nav_scroll').each(function(im,v){
+        //PARENT DIV WIDTH
+        var _this = $(this);
+        var main_div = _this.parent().width();
+        //li WIDTH
+        var item_width = 0;
+        _this.find('li').each(function(){            
+          item_width = item_width + $(this).outerWidth();                              
+        });
+
+        //comapre li and main parent width
+        if(item_width >  main_div ){
+          _this.parent().addClass('nav_scroll_parent');
+          _this.closest('.nav_scroll_parent').prepend('<div class="arrowL has_hide"><img src="https://cdn.shopify.com/s/files/1/2532/9670/files/nav-right-arrow.svg?v=1614228887" alt="right arrow"></div>');
+          _this.closest('.nav_scroll_parent').append('<div class="arrowR"><img src="https://cdn.shopify.com/s/files/1/2532/9670/files/nav-right-arrow.svg?v=1614228887" alt="right arrow"></div>');        
+          _this.wrap('<div class="alt_wrapper pn-ProductNav_'+im+'"><div class="nav-wrapp"></div></div>');    
+        }else{
+          _this.parent().removeClass('nav_scroll_parent');
+          if($('.nav_scroll_parent .arrowL').length > 0){
+            $('.nav_scroll_parent .arrowL').remove();
+          }
+          if($('.nav_scroll_parent .arrowR').length > 0){
+            $('.nav_scroll_parent .arrowR').remove();
+          } 
+          if($('.pn-ProductNav_'+im+'').length > 0){
+            _this.unwrap('<div class="pn-ProductNav_'+im+'"><div class="nav-wrapp"></div></div>');
+          }
+        }
+
+        //wrap div	
+
+        //append width	
+        var arrow_width = _this.closest('.nav_scroll_parent').find('.arrowR').width() + _this.closest('.nav_scroll_parent').find('.arrowL').width();      
+        var add_width = _this.closest('.nav_scroll_parent').width() - arrow_width; 
+        _this.closest('.nav_scroll_parent').find('.pn-ProductNav_'+im+'').css('width',add_width);
+        _this.closest('.nav_scroll_parent').find('.nav-wrapp').css('width',item_width);   
+
+        function hidsh(scrollLeftPrev,_this){
+          var $elem=_this.closest('.nav_scroll_parent').find('.pn-ProductNav_'+im+'');
+          var newScrollLeft = $elem.scrollLeft(),
+              width=$elem.width(),
+              scrollWidth=$elem.get(0).scrollWidth;
+          var offset=0;
+          if (scrollWidth- newScrollLeft-width==offset) {
+            $("body .arrowR").addClass('has_hide');
+          }else{
+            $("body .arrowR").removeClass('has_hide');
+          }
+
+          if (newScrollLeft === 0) {
+            $("body .arrowL").addClass('has_hide');
+          }else{
+            $("body .arrowL").removeClass('has_hide');
+          }
+
+          scrollLeftPrev = newScrollLeft;
+        }
+
+        var scrollLeftPrev = 0;
+        $("body .arrowR").on("click", function(){ 
+          $(this).closest('.nav_scroll_parent').find('.pn-ProductNav_'+im+'').animate( { scrollLeft: '+=100' }, 500);
+        });  
+
+
+        $("body .arrowL").on("click", function(){
+          $(this).closest('.nav_scroll_parent').find('.pn-ProductNav_'+im+'').animate( { scrollLeft: '-=100' }, 500);
+        });
+
+        var scrollLeftPrev = 0;
+        _this.closest('.nav_scroll_parent').find('.pn-ProductNav_'+im+'').scroll(function () {
+          hidsh(scrollLeftPrev,_this);
+        });
+
+      });
+    }
+    scroll_to();
+  }
+  $(window).resize(function(){
+    reheight();
+    if($('.nav_scroll').length > 0){      
+      scroll_to();
+    }
+  });

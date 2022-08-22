@@ -1,0 +1,67 @@
+//quick view with json
+
+$('body').on('click','.quick-btn',function(e){
+  		e.preventDefault();
+  		var a = $(this)
+        var url = a.attr('data-url');
+  		var text = a.text();
+  		a.text('wait..');
+        var data = url+'.js';
+  		//console.log(data);  		
+  		$('.quick_main').html('');
+        $.getJSON(data , function(val){
+          		//console.log(val);
+          		var title = val.title;
+          		var price = val.price;
+          		var images = val.images;
+          		//console.log(images);
+          		var variants = val.variants;
+          		//console.log(variants);
+      			var options = val.options;
+          		$('.quick_main').append('<div class="qm-1"><div class="product-gallery quick-pro_g">');
+          		$.each(images,function(i,v){
+          			$('.product-gallery.quick-pro_g').append('<div class="gallery-image large-slide"><a class="MagicZoom" href="'+images[i]+'" data-gallery="group"><img src="'+images[i]+'" alt="product_image" class="js-zoom-enabled"></a></div>');
+          		});
+          		$('.quick_main').append('</div></div>');
+          		$('.quick_main').append('<div class="qm-2"><div class="quick-details"><form method="post" action="/cart/add" id="'+ val.id +'" accept-charset="UTF-8" class="product_form" enctype="multipart/form-data">');
+          		$('.product_form#'+ val.id +'').append('<h1 class="title">'+ title +'</h1><h6 class="quick-product_price">'+Shopify.formatMoney(price)+'</h6>');
+          		
+          		$('.product_form#'+ val.id +'').append('<div class="filterbysize"><select name="id" data-productid="'+ val.id +'"  id="product-selector-quick" class="product-form__variants no-js" style="display:none;">');
+                $.each(variants,function(i , opt){
+					$('#product-selector-quick').append('<option value="'+ opt.id +'">'+ opt.title +'</option>');
+                });
+          		$('.product_form#'+ val.id +'').append('</select></div>');          		
+
+          		$('.product_form#'+ val.id +'').append('<div class="add-cart-options"><div class="product-form__item product-form__item--quantity"><input type="number" id="Quantity" name="quantity" value="1" min="1" class="product-form__input" pattern="[0-9]*" data-quantity-input></div><div class="add-to-cart"><button type="submit" class="add_cart">Add To Bag</button></div></div>');
+          		$('.product_form#'+ val.id +'').append('<div class="product-description"><div class="desc rte"><p>'+ val.description +'</p></div></div>');
+          		
+          		$('.quick_main').append('</form></div></div>');
+          
+          	    new Shopify.OptionSelectors("product-selector-quick", { product: val , enableHistoryState: true }); 
+          
+                 var form = $('.single-option-selector').closest('form');
+                  $('<div id="quick_swatch"></div>').insertAfter('.quick-product_price');
+                  $('.single-option-selector').each(function(){
+                    var opt = $(this);
+                    var label = opt.closest('div').find('label').text();
+                    //console.log(label);
+                    var ele = '<ul class="swatch-'+label+'" data-option="'+opt.attr('id')+'">';
+                    $(this).find('Option').each(function(i,v){
+                      ele += '<li data-val="'+$(v).val()+'">'+$(v).val()+'</li>';
+                    });
+                    ele += '</ul>';
+                    $('#quick_swatch').append(ele);
+                  });
+                  $('#quick_swatch li').on('click',function(){
+                    $('#quick_swatch li').css({'background-color':'unset','color':'black'});
+                    var sel = $(this).parent('ul').attr('data-option');
+                    var val = $(this).attr('data-val');
+                    $('#'+sel).val(val).trigger('change');                    
+                    $(this).css({'background-color':'black','color':'white'});
+                  });
+          
+          		a.text(text);
+        		$('.quick_view').addClass('active');
+          		$('.overlay').addClass('active');          
+        });
+	});

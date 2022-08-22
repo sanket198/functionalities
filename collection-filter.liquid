@@ -1,0 +1,94 @@
+<div class="filterWrap">
+  {% for block in section.blocks %}
+  {% if block.settings.show_filter %} 
+  {% if block.type == 'filter' %} 
+  {% assign tags = block.settings.filter_by  | replace: ' ,', ',' | replace: ', ', ',' | split: ',' %}    
+  {% assign tagCount = 0%}{% for tag in tags %}{% if collection.all_tags contains tag %}{% assign tagCount = tagCount | plus: 1 %}{% endif %}{% endfor %}
+  <div class="colFilterData" data-item="{{ block.settings.filter_by_title | handle }}_{{ forloop.index }}" {% if tagCount == 0 %}style="display:none;"{% endif %} >
+    <div class="filterWrap" >
+      {% assign fn = block.settings.filter_by_title %}
+      <h3>{{ fn }}</h3>
+      <div>
+        <ul class="filtersList scrollbar-inner {% if fn contains 'Color'%} colorList {% endif %} ">
+            {% for tag in tags %}
+            {% if current_tags contains tag %}
+            <li data-group="{{ fn }}" data-handle="{{ tag | handle }}" class="advanceFiler current {{ tag | remove: 'cf-size-' | remove: 'COLOR_' | remove: 'PRICE_' | replace: '_',' ' | downcase }} filterTagActive">{{ tag | remove: 'cf-size-' | remove: 'COLOR_' | remove: 'PRICE_' | replace: '_',' ' | link_to_remove_tag: tag }}</li>
+            {% elsif collection.all_tags contains tag %}
+            <li data-group="{{ fn }}" data-handle="{{ tag | handle }}" class="advanceFiler {{ tag | remove: 'cf-size-' | remove: 'COLOR_' | remove: 'PRICE_' | replace: '_',' ' | downcase }}">{{ tag | remove: 'cf-size-' | remove: 'COLOR_' | remove: 'PRICE_' | replace: '_',' ' | link_to_add_tag: tag }}</li>
+            {% endif %}
+            {% endfor %}
+          
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %} 
+  {% endfor %}
+
+
+  <div class="totalResults  ">
+    <div class="filterWrap">
+      <span>{{ collection.products_count  }} Results</span>
+      {% if current_tags %}
+      <br/><br/>
+      <a class="remeveAll button" href="/collections/{{ collection.handle }}">Clear all filters</a>
+      {% endif %}
+    </div>
+  </div>
+  
+  <script>
+    $(function() {
+      
+      $('.advanceFiler').each(function(){
+        var a = $(this).find('a');
+        var tl = a.attr('title');
+        a.attr('title',tl.replace('cf-size-',''));
+      });
+      
+      $('.advanceFiler').on('click', function(e) {
+        var el = $(this);
+        var elGroup = el.data('group');
+        var elHandle = el.data('handle');
+        var activeTagInGroup = $('.filterTagActive[data-group="'+ elGroup +'"]');
+        if ( !el.hasClass('filterTagActive')  && activeTagInGroup.size() ) {
+          e.preventDefault();
+          location.href = location.href.replace(activeTagInGroup.data('handle'), elHandle).replace(/(&page=\d+)|(page=\d+&)|(\?page=\d+$)/, '');
+        }
+      });
+    });
+  </script>
+</div>
+{% schema %}
+  {
+    "name": "Collection Filter",
+    "settings": [
+    ],
+	"blocks":[
+	  {  
+         "type":"filter",
+         "name":"Filter",
+		 "limit": 6,
+         "settings":[
+		  {
+            "type": "checkbox",
+            "id": "show_filter",
+            "label": "Display filter?"
+          },
+          {
+            "type": "text",
+            "id": "filter_by_title",
+            "label": "Filter by title",
+            "default": "Filter by"
+          },
+          {
+            "type": "textarea",
+            "id": "filter_by",
+            "label": "Tag filter",
+			"info": "Add tag using comma saperate"
+          }
+         ]
+      }
+	]
+  }
+{% endschema %}

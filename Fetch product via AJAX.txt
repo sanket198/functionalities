@@ -1,0 +1,32 @@
+<div class="cross-sell" id="cross-sell" data-productid="{{ product.id }}">
+  <h2>We think you'll love</h2>
+  <div class="cross-sell-content">
+    {% for tag in product.tags %}
+      {% if tag contains '#' %}
+        {% assign c = tag | remove: '#' %}
+          <div class="cross-sell-wrapper" data-href="/products/{{ c }}" style="display:none;">
+          </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+<script>
+$(document).ready(function () {
+  $('.cross-sell-wrapper').each(function(){
+    var mf = "{{ shop.money_format }}";
+    var a = $(this);
+    var urlPro = a.attr('data-href');
+    var url = a.attr('data-href')+'.json';
+    $.getJSON(url, function(p){
+      console.log(p);
+      console.log(p.product.variants[0].price);
+      var tblRow = "<div class='cs-wrapper'><div class='info'><div class='img'><a href='"+urlPro+"'><img src='"+ p.product.image.src +"' alt='"+ p.product.image.alt+"' /></a></div><div class='product-meta'><a href='"+urlPro+"'><p class='ptitle'>"+ p.product.title +"</p><span class='ProductItem__Price Price  Text--subdued' data-money-convertible>"+ Shopify.formatMoney(p.product.variants[0].price, mf) +"</span></a></div></div></div>";
+      $(tblRow).appendTo(a);
+      $(a).show();        
+    }).fail(function() { 
+      console.log('fail');
+      a.remove();
+    });
+  });
+});
+</script>

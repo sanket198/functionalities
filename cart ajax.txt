@@ -1,0 +1,71 @@
+//cart add ajax
+
+$('body').on('click','#donate_btn',function(){
+    $('#add_cart').trigger('click');
+    //alert('hi');	
+});
+
+  $('body').on('click','#add_cart',function(){
+    var id = $('#donate_btn').attr('data-id');
+    var i = $('.qty_dnt').val();
+//     alert(id);
+     //alert(i);
+     $.ajax({
+      type: 'POST',
+      url: '/cart/add.js',
+      async:false,
+      data: { id: id, quantity: i },
+      dataType: 'json',
+      error: function(jqXHR, textStatus, errorThrown){
+        var response = $.parseJSON(jqXHR.responseText);
+        //alert(response.description);
+        $('#cartPage').removeClass('loading');
+      },
+      success: function() {
+        $.getJSON('/cart.js', function(c){
+//           $('body').addClass('test');
+//           $('.cart-button span').text(c.item_count);
+//           $('#CartCount span:first-child').text(c.item_count);
+          	
+        });
+        $.get( "/cart?view=mini_cart", function( data ) {
+          //$('body').addClass('addDonation');
+          $('#crt').html(data);
+          //$('#cartPage').removeClass('loading');
+        });
+      }
+    });
+  
+  }); 
+
+
+//cart update ajax
+
+
+$('body').on('change , keyup','.item-quantity',function(){
+  var input = $(this).parent().find('input');
+  var qty = parseInt($(this).val()); 
+  //   	alert(qty);
+  var id = parseInt(input.attr('data-id')); 
+  //   	console.log('updates['+id+']='+qty);
+  $.ajax({
+    type:"POST",
+    url: "/cart/update.js",
+    data: "updates["+id+"]="+qty,
+    dataType: "json",
+    error: function(jqXHR, textStatus, errorThrown){
+      //       	console.log(jqXHR);
+      //       	console.log(textStatus);
+      //       	console.log(errorThrown);
+      var response = $.parseJSON(jqXHR.responseText);
+      alert(response);
+      //       	console.log("reponse");
+    }
+  }).done(function(data){
+    //           	console.log("reponse25615");
+    addToCartSuccess();
+    $.getJSON("/cart.js",function(cart){
+      refreshCart(cart);
+    });
+  });
+});

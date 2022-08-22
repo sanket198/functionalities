@@ -1,0 +1,76 @@
+<script>
+  var p_id = Number('{{product.id}}');
+                    window.option_list = [];
+                    function op_index(ind){
+    console.log('aaaaaaaa');
+    var cur_selected = jQuery('.variant_options[data-op_index="'+ ind +'"] .single-option-selector:checked').val()
+    switch (ind) {
+      case 0:
+        var key = '0';
+        break;
+      case 1:
+        var key = jQuery('.variant_options[data-op_index="0"] .single-option-selector:checked').val();
+        break;
+      case 2:
+        var key = jQuery('.variant_options[data-op_index="0"] .single-option-selector:checked').val();  
+        key += ' / ' + jQuery('.variant_options[data-op_index="1"] .single-option-selector:checked').val();
+    }
+    jQuery('.variant_options[data-op_index="' + ind + '"] .single-option-selector').each(function() {
+      if (jQuery.inArray($(this).val(),  window.option_list[p_id][key]) !== -1) {
+        $(this).closest('.variant-input').removeClass('soldOut');
+        $(this).removeAttr('disabled','disabled').prop("checked",false);
+      }else {
+        $(this).closest('.variant-input').addClass('soldOut');
+        $(this).attr('disabled','disabled').prop("checked",false);
+      }
+    });  
+    console.log(cur_selected + ' cur_selected');
+    if (jQuery.inArray(cur_selected, window.option_list[p_id][key]) !== -1 && jQuery('.single-option-selector[value="'+ cur_selected +'"]').length) {
+      jQuery('.single-option-selector[value="'+ cur_selected +'"]').closest('.variant-input').removeClass('soldOut');
+      jQuery('.single-option-selector[value="'+ cur_selected +'"]').prop("checked",true);
+    }else{
+      jQuery('.variant_options[data-op_index="' + ind + '"] .single-option-selector[value="'+ window.option_list[p_id][key][0] +'"]').closest('.variant-input').removeClass('soldOut');
+      jQuery('.variant_options[data-op_index="' + ind + '"] .single-option-selector[value="'+ window.option_list[p_id][key][0] +'"]').prop("checked",true);
+    }
+  }
+  window.get_product_options = function(product) {
+    window.option_list[product.id] = [];
+    for (var i=0; i<product.variants.length; i++) {
+      var variant = product.variants[i];
+      if (variant.available) {
+        window.option_list[product.id][0] = window.option_list[product.id][0] || [];
+        window.option_list[product.id][0].push(variant.option1);
+        window.option_list[product.id][0] = Array.from(new Set(window.option_list[product.id][0]));
+        if (product.options.length > 1) {
+          var val = variant.option1;
+          window.option_list[product.id][val] = window.option_list[product.id][val] || [];
+          window.option_list[product.id][val].push(variant.option2);
+          window.option_list[product.id][val] = Array.from(new Set(window.option_list[product.id][val]));
+        }
+        if (product.options.length === 3) {
+          var val = variant.option1 + ' / ' + variant.option2;
+          window.option_list[product.id][val] = window.option_list[product.id][val] || [];
+          window.option_list[product.id][val].push(variant.option3);
+          window.option_list[product.id][val] = Array.from(new Set(window.option_list[product.id][val]));
+        }
+      }
+    }
+    op_index(0);
+    if (product.options.length > 1) op_index(1);
+    if (product.options.length === 3) op_index(2);
+
+    jQuery(".variant_options[data-op_index='0'] .single-option-selector").change(function() {
+      op_index(1);
+      if (product.options.length === 3) op_index(2);
+      return true;
+    });
+    // When there is an update in the second dropdown.
+    jQuery(".variant_options[data-op_index='1'] .single-option-selector").change(function() {
+      if (product.options.length === 3) op_index(2);
+      return true;
+    });  
+  };
+  {% if product.available %}
+  get_product_options({{ product | json }});
+  {% endif %}
+</script>

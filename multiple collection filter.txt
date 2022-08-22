@@ -1,0 +1,78 @@
+<div class="col_tab">
+      <ul>
+        {% for block in section.blocks %}
+            {% assign x =  block.settings.collection_select %}
+            <li data-id="{{ collections[x].id }}" {% if x == 'all' %}class="active"{% endif %}>{{ collections[x].title }}</li>		
+        {% endfor %}
+      </ul>
+	</div>
+	<div class="col_tab_content">
+		{% for block in section.blocks %}
+      		{% assign pr = block.settings.collection_select %}      		
+      		<div class="col_products{% if pr == 'all' %} slide-active{% endif %}" id="{{ collections[pr].id }}">
+              	{% if block.settings.pro_desc != blank %}
+              	<div class="pro_desc">
+                  <p>{{ block.settings.pro_desc }}</p>
+              	</div>
+              	{% endif %}
+              	<div class="col-row demo">
+      				{% for copt in collections[pr].products %}
+                        <div class="col-three product-item">
+                          <div class="product-img">
+                              <a href="{{ copt.url |  within: collection }}"><img src="{% if copt.featured_image != blank %}{{ copt.featured_image | img_url:'master' }}{% else %}https://dummyimage.com/413.33x275.02/000/fff&text=no+image{% endif %}" alt="Adra Steel Grey"></a>
+                              <div class="quick-shop">
+                                  <a href="#" class="quick-btn" data-url="/products/{{ copt.handle }}?view=quick_view" data-productid="{{ copt.id }}">Quick Shop</a>							    
+                                    <div class="quick-sizes">                                                                  
+                                    {% for option in copt.options_with_values %}
+                                        {% for value in option.values %}
+                                            {% if option.name == 'Size' %}                                			
+                                                {% for variant in copt.variants %}
+                                                    {% if variant.option1 == value and variant.option2 == copt.selected_or_first_available_variant.option2 %}
+                                                      <form method="post" action="">
+                                                        <input type="hidden" name="id" value="{{ variant.id }}" />
+                                                        <button type="submit" class="shop_cart_btn" id="shop-add_cart_btn">{{ value }}</button>
+                                                      </form>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                  </div>
+                              </div>
+                          </div>
+                          <h2 class="product-meta">
+                              <span class="product-title"><a href="{{ copt.url | within: collection }}">{{ copt.title }}</a><span class="price">{{ copt.price | money }}</span></span> 							
+                                <span class="product-conf">
+                                {% for option in copt.options_with_values %}                                     
+                                        {% if option.name == 'Color' %}                                
+                                            {{ option.values.size }} colors availabale
+                                        {% endif %}
+                                    {% endfor %}                            
+                                </span>                        
+                          </h2>
+                      </div>
+              		{% endfor %}
+              </div>
+      		</div>
+      	{% endfor %}
+	</div>
+
+
+"blocks" : [
+		{
+			"type": "text",
+			"name" : "Collection",
+			"settings": [
+				{
+					"type": "textarea",
+					"id" : "pro_desc",
+					"label": "Product Description"
+				},
+				{
+					"type": "collection",
+					"id": "collection_select",
+					"label": "Select Collection"
+				}				
+			]
+		}
+	]

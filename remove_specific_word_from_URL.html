@@ -1,0 +1,13 @@
+function returnRefinedURL (key, url) {
+  var urlParts = url.split('?');
+  if (urlParts.length === 1 || url.indexOf(key) === -1 ) {
+    return url;
+  }else {
+    var keyValues = urlParts[1].split('&'),
+        refinedKeyValues = keyValues.filter(function (keyValuePair) {
+          return keyValuePair.indexOf(key) !== 0;
+        }).join('&');
+  }
+  return urlParts[0] + '?' + refinedKeyValues;
+}
+currentURL = returnRefinedURL ('filter.', currentURL);

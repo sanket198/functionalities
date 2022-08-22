@@ -1,0 +1,79 @@
+<div class="{{ block.settings.video_type }} videotype">
+<iframe class="vimeo videoFrame" data-video_id="{{ block.settings.video }}" id="video_image_{{ loop }}_{{block.id}}" autoplay="true" frameborder="0" allowfullscreen="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" title="YouTube video player" width="1920" height="680" src="https://player.vimeo.com/video/{{ block.settings.video }}?api=1&title=0&byline=0&portrait=0&transparent=0"></iframe>
+</div>
+
+function postMessageToPlayer(player, command){
+    if (player == null || command == null) return;
+    player.contentWindow.postMessage(JSON.stringify(command), "*");
+  }
+  function playpauseiframe(overlay_popup){
+    var command,slideType,player,control,video;
+    slideType = overlay_popup.find(".videotype").attr("class").split(" ")[0];
+
+    player = overlay_popup.find("iframe").get(0);
+    if(overlay_popup.find("iframe").hasClass('playiframe')){
+      control='play';
+    }else{
+      control='pause';
+    }
+    if (slideType === "vimeo") {
+      switch (control) {
+        case "play":
+         
+          if (!overlay_popup.hasClass('started')) {
+            overlay_popup.addClass('started');
+            postMessageToPlayer(player, {
+              "method": "setCurrentTime",
+              "value" : ''
+            });
+          }
+          postMessageToPlayer(player, {
+            "method": "play",
+            "value" : 1
+          });
+          
+          overlay_popup.find("iframe").removeClass("playiframe");
+          break;
+        case "pause":
+          postMessageToPlayer(player, {
+            "method": "pause",
+            "value": 1
+          });
+          overlay_popup.find("iframe").addClass("playiframe"); 
+          break;
+      }
+    } else if (slideType === "video") {
+      video = overlay_popup.find("video").get(0);
+      if (video != null) {
+        if (video.paused){
+          video.play();
+        } else {
+          video.pause();
+        }
+      }
+    }
+
+  }
+  
+
+$('.video_button').on('click', function(ev) {
+    var index = $(this).data("index");
+    var overlay_popup;
+    overlay_popup = $('.overlay_popup.custom_popup_show_'+index);
+    jQuery('body,html').toggleClass('scollno').toggleClass('popupopen');
+    overlay_popup.toggleClass('popup_show');
+    var index = $(this).data("index");
+    var video = $(this).data("video");
+    overlay_popup.find(".videoFrame").addClass('playiframe');
+//     overlay_popup.find(".videoFrame")[0].src += "&autoplay=1";
+    playpauseiframe(overlay_popup);
+
+    ev.preventDefault();
+  });
+
+jQuery('.close_popup').click(function (m) { 
+    var overlay_popup = $(this).parents('.overlay_popup');
+    overlay_popup.removeClass('popup_show');
+//     var src = overlay_popup.find('iframe').attr("src");    
+    playpauseiframe(overlay_popup);
+  });

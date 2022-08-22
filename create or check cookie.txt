@@ -1,0 +1,90 @@
+function getCookie(cname) {
+  var name = cname + "=";  
+  var decodedCookie = decodeURIComponent(document.cookie);
+ 	//alert(decodedCookie);
+  var ca = decodedCookie.split(';');
+ 
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function setCookie(cname,cvalue,exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires=" + d.toGMTString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function checkcookie() {
+  var user=getCookie("username");
+  if (user != "") {
+    
+  } else {
+    //alert();
+     user = 'kel';
+     var username = "username";
+    	//alert(user);
+     if (user != "" && user != null) {
+       setCookie(username,user,30);
+       $('.loader-gif').css('display','block');
+     }
+  }
+}
+
+<body class="index" onload="checkcookie()">
+
+
+
+//another way for create cookie
+
+//add script at theme.liquid after included theme.js
+
+<script> 
+      $(function() {
+        function openNewsletterPopup(){
+          $('.popupBox').addClass('slideInDown');
+          $('.popupBox').removeClass('slideOutUp');
+          $('.popupOverlay').fadeIn('slow');
+        }
+        var popup = $.cookie('popup');
+        var cookie_enabled = {% if settings.newsletter_popup_days != blank and settings.newsletter_popup_days != "0" %}true{% else %}false{% endif %};
+
+        if (cookie_enabled && popup == 'open') {
+          return false;
+        } else {
+
+          openNewsletterPopup();
+        }
+        if (cookie_enabled) {
+          $.cookie('popup', 'open', { expires: {{ settings.newsletter_popup_days }} });
+                                    }
+                   });
+</script>
+
+//include js at theme.liquid
+{{ 'https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js' | script_tag }}
+
+ or
+
+<script src="//cdn.shopify.com/s/files/1/0111/9164/8314/t/7/assets/cookie.js?4269"></script>
+
+//add schema at settings_schema
+{
+    "name": "news latter",
+    "settings": [
+      {
+        "type": "text",
+        "id": "newsletter_popup_days",
+        "label": "newsletter popup days",
+        "default": "0"
+      }
+    ]
+  }

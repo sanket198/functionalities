@@ -1,0 +1,127 @@
+<script>
+  $('#contact_form').on('submit',function(){
+    var x = true;
+    $(this).find('.err-msg').remove();
+    var fn = $(this).find('#fname');
+    var ln = $(this).find('#lname');
+    var em = $(this).find('#Email');
+    var pn = $(this).find('#phone');
+    if(fn.val().trim() == ''){
+      fn.css('border-bottom','1px solid red');
+      fn.parent().append('<p class="err-msg">Please enter first name.</p>');
+      x = false;
+    } else {
+      fn.css('border-bottom','1px solid #000');
+      fn.parent().find('.err-msg').remove();
+    }
+    if(ln.val().trim() == ''){
+      ln.css('border-bottom','1px solid red');
+      ln.parent().append('<p class="err-msg">Please enter last name.</p>');
+      x = false;
+    } else {
+      ln.css('border-bottom','1px solid #000');
+      ln.parent().find('.err-msg').remove();
+    }
+    var phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    if(pn.val().trim() == '' || !phoneno.test(pn.val())) {
+      pn.css('border-bottom','1px solid red');
+      pn.parent().append('<p class="err-msg">Please enter valid phone number...</p>');
+      x = false;
+    } else {
+      pn.css('border-bottom','1px solid #eaeaea');
+      pn.parent().find('.err-msg').remove();
+    }
+    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if(em.val().trim() == '' || !regex.test(em.val())) {
+      em.css('border-bottom','1px solid red');
+      em.parent().append('<p class="err-msg">Please enter valid e-mail...</p>');
+      x = false;
+    } else {
+      em.css('border-bottom','1px solid #eaeaea');
+      em.parent().find('.err-msg').remove();
+    }
+    if(x==false) {
+      return false;
+    }
+  });
+</script>
+
+<div class="appointment_popup">
+  <div class="close_icon">
+    x
+  </div>
+  <div class="content_wp">
+    <div class="logo_icon">
+      
+    </div>
+    <div class="content">
+      <ul>
+        <li>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</li>
+        <li>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</li>
+        <li>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</li>
+      </ul>      
+      <div class="checkboxes">
+        <h4>Undertake</h4>
+        <div class="input_check">
+          <input type="checkbox" id="checkbox1">
+          <label for="checkbox1">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</label>
+        </div>
+        <div class="input_check">
+          <input type="checkbox" id="checkbox2">
+          <label for="checkbox2">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</label>
+        </div>
+      </div>
+      <div class="submit_btn">
+          <a href="#">Submit</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+.appointment_popup{
+  position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    z-index: 99999;
+    width: 1080px;
+  color: #000;
+    padding: 20px 30px 20px 40px;
+      max-height: 80%;
+    overflow-y: auto;
+}
+.appointment_popup .close_icon{
+      color: #000;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}
+.appointment_popup .content_wp ul{
+      list-style: auto;
+}
+.appointment_popup .content_wp ul li{
+      margin-bottom: 20px;  
+}
+.appointment_popup .content_wp .checkboxes{
+      margin-bottom: 20px;    
+}
+.appointment_popup .content_wp .checkboxes .input_check{
+      display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.appointment_popup .content_wp .checkboxes .input_check input{
+      width: 22px;
+    height: 22px;
+}
+.appointment_popup .content_wp .checkboxes .input_check label{
+      margin: 0;
+    margin-left: 10px;
+}
+.appointment_popup .content_wp .submit_btn{
+  text-align: right;
+}
+.appointment_popup .content_wp .submit_btn a{
+  color: #000;
+}

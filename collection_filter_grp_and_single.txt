@@ -1,0 +1,151 @@
+{% assign number_of_tag_show = 8 %}
+<div class="col_filter ">
+  {% for block in section.blocks %}
+  {% if block.type == 'filter' and collection.current_type == blank %}
+    {% if block.settings.show_filter %}
+  		{% assign cnt_tag = 0 %}
+      <div class="filter-col custom_filter_{{ forloop.index }}">
+      <div class="filter-col-inner">
+        {% assign fn = block.settings.title %}
+        <h5>
+          {{ fn }} :
+          <span class="expand"></span>
+        </h5>
+        <div class="filter-list">
+          {% assign tags = block.settings.filter_by | replace: ' ,', ',' | replace: ', ', ',' | split: ',' %}
+          <ul>
+            {% assign cnt_tag_filter = 0 %}
+            {% assign name = fn %}
+            {% for tag in tags %}
+              {% if collection.all_tags contains tag %}
+            	{% assign cnt_tag = cnt_tag | plus : 1 %}
+                <li>
+                  <div class="radio-select {% if current_tags contains tag %}current_tags{% endif %}">
+                    <input type="radio" id="{{ tag | handleize }}" class="trigger_box" name="{{ tag }}" {% if current_tags contains tag %}checked="checked"{% endif %}>
+                    <label for="{{ tag | handleize }}" class="tag_label" data-tag_href="">{% if current_tags contains tag %}{{ tag | link_to_remove_tag : tag }}{% elsif collection.all_tags contains tag %}{% if section.settings.group_filter %}{{ tag | link_to_add_tag: tag }}{% else %}{{ tag | link_to_tag: tag }}{% endif %}{% endif %} <span class="get_cnt">(0)</span></label>
+                  </div>
+                </li>
+                {% assign cnt_tag_filter = cnt_tag_filter | plus : 1 %}
+              {% endif %}
+              {% if cnt_tag_filter == number_of_tag_show %}
+                  {% break %}
+              {% endif %}
+            {% endfor %}
+            {% if tags.size > number_of_tag_show %}
+              <li class="view-more-ex">
+                <a href="#" class="filter_view_more">
+                  <span>View More</span>
+                  <i>
+                    {% include 'icon-view_more' %}
+                  </i>
+                </a>
+              </li>
+            {% endif %}
+            <div class="all_hidden_filter">
+              {% for tag in tags offset:number_of_tag_show %}
+              {% if collection.all_tags contains tag %}
+              <li>
+                <div class="radio-select">
+                  <input type="radio" id="{{ tag | handleize }}" name="{{ tag }}" {% if current_tags contains tag %}checked="checked"{% endif %}>
+                  <label for="{{ tag | handleize }}" class="tag_label" data-tag_href="">{% if current_tags contains tag %}{{ tag | link_to_remove_tag : tag }}{% elsif collection.all_tags contains tag %}{% if section.settings.group_filter %}{{ tag | link_to_add_tag: tag }}{% else %}{{ tag | link_to_tag: tag }}{% endif %}{% endif %} <span class="get_cnt">(0)</span></label>
+                </div>
+              </li>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% if cnt_tag == 0 %}
+  <style>
+    .custom_filter_{{ forloop.index }}{
+      display:none;
+    }
+  </style>
+  {% endif %}
+    {% endif %}
+  {% elsif block.type == 'type_filter' %}
+    {% if block.settings.show_type %}
+      {% assign typecnt = 0 %}
+      {% for product_type in collection.all_types %}
+      {% if product_type != blank %}
+      {% assign typecnt = typecnt | plus: 1 %}
+      {% endif %}
+      {% endfor %}
+      {% assign fnn = block.settings.title  %}
+      <div class="filter-col">
+      <div class="filter-col-inner">
+        <h5>
+          {% if collection.current_type == blank %}{{ fnn }}{% else %}{{ collection.current_type }}{% endif %} :
+          <span class="expand"></span>
+        </h5>
+        <div class="filter-list">
+          <ul>
+            {% if typecnt == 0 %}
+            <li>
+              <div class="radio-select">
+                <input type="radio" {% if collection.current_type == product_type %}checked="checked"{% endif %} data-value="{{ product_type }}" id="{{ product_type }}" name="radio-group">
+                <label for="{{ product_type }}">No {{ fnn }}</label>
+              </div>
+            </li>
+            {% else %}
+              {% assign cnt_type = 0 %}
+              {% for product_type in collection.all_types %}
+                {% if product_type != blank %}
+                  {% assign product_type_tag = product_type | handle %}
+                  <li>
+                    <div class="radio-select">
+                      <input type="radio" {% if collection.current_type == product_type %}checked="checked"{% endif %} data-value="{{ product_type }}" id="{{ product_type }}" name="radio-group">
+                      <label for="{{ product_type }}">{{ product_type | link_to_type }}</label>
+                    </div>
+                  </li>
+                  {% assign cnt_type = cnt_type | plus : 1 %}
+                {% endif %}
+                {% if cnt_type == number_of_tag_show %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+              {% assign all_col_type = collection.all_types.size | plus : 0 %}
+              {% if all_col_type > number_of_tag_show %}
+              <li class="view-more-ex">
+                <a href="#" class="filter_view_more">
+                  <span>View More</span>
+                  <i>
+                    {% include 'icon-view_more' %}
+                  </i>
+                </a>
+              </li>
+              {% endif %}
+              <div class="all_hidden_filter">
+                {% for product_type in collection.all_types offset:number_of_tag_show %}
+                  {% if product_type != blank %}
+                    {% assign product_type_tag = product_type | handle %}
+                    <li>
+                      <div class="radio-select">
+                        <input type="radio" {% if collection.current_type == product_type %}checked="checked"{% endif %} data-value="{{ product_type }}" id="{{ product_type }}" name="radio-group">
+                        <label for="{{ product_type }}">{{ product_type | link_to_type }}</label>
+                      </div>
+                    </li>
+                    {% assign cnt_type = cnt_type | plus : 1 %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endif %}
+  {% endfor %}
+</div>
+
+<script>  
+  $(document).ready(function(){
+    $('body').on('click','.radio-select input',function(){      
+      var src = $(this).closest('.radio-select').find('a').attr('href');
+      window.location.href = src;
+    });
+  });
+</script>

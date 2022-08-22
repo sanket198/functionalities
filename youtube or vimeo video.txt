@@ -1,0 +1,159 @@
+//place this script at before </head>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+//place this script at before </body>
+<script src="//cdn.codeblackbelt.com/js/modules/video-background/main.min.js?shop=maypro.myshopify.com"></script>
+
+//place this code where video occur
+{% if block.settings.video_url.type == 'youtube' %}
+            <iframe id="video_v1" class="embed-player slide-media" src="https://www.youtube.com/embed/{{ block.settings.video_url.id }}?title=0&byline=0&portrait=0&transparent=0&enablejsapi=1&controls=0&fs=0&iv_load_policy=3&rel=0&showinfo=0&loop=1&playsinline=1&modestbranding=1&branding=0&autohide=0&cc_load_policy=0&wmode=opaque&playlist={{ block.settings.video_url.id }}&autoplay=1&mute=1" frameborder="0"  allow="autoplay; encrypted-media"></iframe>             	                                    
+                <script>
+                  var player;
+                  function onYouTubeIframeAPIReady() {
+                    player = new YT.Player('video_v1', {
+                      videoId: '{{ block.settings.video_url.id }}',
+                      playerVars: {
+                      modestbranding: 0,
+                      autoplay: 1,
+                      controls: 0,
+                      showinfo: 0,
+                      wmode: 'transparent',
+                      branding: 0,
+                      rel: 0,
+                      autohide: 0,
+                      origin: window.location.origin
+                    },
+                                           events: {
+                                           'onReady': onPlayerReady,
+                                           'onStateChange': onPlayerStateChange
+                                           }
+                                           });
+                  }
+                  function onPlayerReady(event) {
+
+                    event.target.playVideo();
+
+                    var interval_is_stopped = false;
+                    setInterval(function (){
+                      var current_time = event.target.getCurrentTime();
+
+                      if (current_time > 5 && !interval_is_stopped) {
+                        interval_is_stopped = true;
+                        jQuery('#video_v1').fadeTo(400, 0.7, function(){
+                          player.seekTo(0);
+                          jQuery(this).fadeTo(400, 1, function(){
+                            interval_is_stopped = false;
+                          });
+                        });
+                      }
+                    }, 10);
+
+                    setTimeout(function(){
+                      $('.top').removeClass('loading');
+                    },1000);
+                  }
+                  function onPlayerStateChange(event) {
+                    if (event.data === YT.PlayerState.ENDED) {
+                      player.playVideo(); 
+                    }
+                  }
+                </script>	
+            	<style>
+                   .top {
+                     position: relative;
+                   }
+                  }
+                  {% if section.settings.desktopImage != blank %}
+                  .top.loading:after {
+                    position: absolute;
+                    content: '';
+                    left: 0;
+                    top:0;
+                    bottom: 0;
+                    right: 0;
+                    background: url({{ section.settings.desktopImage | img_url: 'master' }}) no-repeat;
+                    background-size: cover;
+                    z-index: 2;
+                  }
+                  {% endif %}
+                  
+                              .gallery-cell{
+                                padding-bottom: 42.5%;
+                                overflow: hidden;
+                                height: 0;
+                              }
+                              .gallery-cell .vide-slider{
+                              	position: relative;
+                                padding-bottom: 136%;
+                                padding-top: 15%;
+                                overflow: hidden;
+                                transform: translateY(-35.95%);
+                              }
+
+                              .gallery-cell .vide-slider iframe{
+                                position: absolute;
+                                left: 0;
+                                top: 0;
+                                width: 100%;
+                                height: 100%;
+                              }
+           					 </style>
+            	{% else %}
+                  <div id="vmo_v1"></div>                
+                      {% if block.settings.video_url.type == 'vimeo' %}
+                            <script src="https://player.vimeo.com/api/player.js"></script>
+                            <script>
+                                      /*var iframe = $('#vmo_v1').get(0);
+                          var player = new Vimeo.Player(iframe);
+                          player.on('play', function() {
+                            console.log('played the video!');
+                          });*/
+                              var options = {
+                                id: {{ block.settings.video_url.id }},
+
+                                loop: true,
+                                autoplay: true,
+                                background: false,
+                                title:0,
+                                sidedock:0,  
+                                controls:0,
+                                playlist: {{ block.settings.video_url.id }},
+                                muted: true
+                              };
+	
+                              var player = new Vimeo.Player('vmo_v1', options);
+
+                              player.ready().then(function() {
+                                console.log('played the video!');
+                              });
+//                               $(window).on('load', function(){
+//                                 alert();
+//                                 setTimeout(function(){
+//                                   $('#vmo_v1').css('opacity','1');
+//                                 },1000);
+//                               });
+                            </script>
+            				<style>
+                              .gallery-cell{
+                                padding-bottom: 42.5%;
+                                overflow: hidden;
+                                height: 0;
+                              }
+                              .gallery-cell .vide-slider{
+                              	position: relative;
+                                padding-bottom: 136%;
+                                padding-top: 15%;
+                                overflow: hidden;
+                                transform: translateY(-35.95%);
+                              }
+
+                              .gallery-cell .vide-slider iframe{
+                                position: absolute;
+                                left: 0;
+                                top: 0;
+                                width: 100%;
+                                height: 100%;
+                              }
+           					 </style>
+                      {% endif %}
+              {% endif %}  

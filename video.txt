@@ -1,0 +1,14 @@
+{% if product.metafields.video != blank %}
+                  {% assign vid_url = product.metafields.video %}
+                  {% assign key = 'video_url' %}
+                    <div class="slides in-af" style="display:block;">
+                      {% if vid_url[key] contains 'vimeo.com' %}
+                      	<iframe src="{{ vid_url[key] }}" style="width:100%;height:422.81px;margin-top:48px;" frameborder="0" muted autoplay="autoplay" loop onclick="videocontrols()"></iframe>
+					 {% else %}
+                      <video id="product_video" muted autoplay="autoplay" loop onclick="videocontrols()" style="width:100%;height:422.81px;margin-top:48px;">
+                        <source src="{{ vid_url[key] }}" type="video/mp4" />
+                        <source src="{{ vid_url[key] }}" type="video/webm" >
+                      </video>
+                      {% endif %}
+                    </div>
+                  {% endif %}

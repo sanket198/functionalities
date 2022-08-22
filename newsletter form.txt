@@ -1,0 +1,126 @@
+//html
+{% assign form = settings.newsletter_option %}
+        {% case form %}
+        {% when 'mailchimp' %}
+        <form action="{{ settings.action_url }}" method="post" name="mc-embedded-subscribe-form" class="validate newsletter_form" target="_blank" novalidate>                     
+          <div class="subscribe-input">  
+            <input type="email" id="subscribe_input_footer" name="EMAIL" placeholder="{{ 'layout.footer.email_placeholder' | t }}">
+            <button type="submit" name="subscribe">
+              {{ 'layout.footer.submit_btn' | t }}
+              {% include 'icons' with 'left-arrow' %}
+            </button>
+            <p class="err_msg"></p>
+          </div>
+        </form>        	
+        {% when 'klaviyo' %}
+        <form id="email_signup_footer" class="newsletter_form klaviyo_styling klaviyo_gdpr_embed_{{ settings.klaviyo_id }}" action="//manage.kmail-lists.com/subscriptions/subscribe" data-ajax-submit="//manage.kmail-lists.com/ajax/subscriptions/subscribe" method="GET" novalidate="novalidate">            
+          <input type="hidden" name="g" value="{{ settings.klaviyo_id }}">
+          <div class="subscribe-input">  
+            <input type="email" name="email" id="subscribe_input_footer"  placeholder="{{ 'layout.footer.email_placeholder' | t }}">
+            <button type="submit" name="subscribe">
+              {{ 'layout.footer.submit_btn' | t }}
+              {% include 'icons' with 'left-arrow' %}
+            </button> 
+            <p class="err_msg"></p>
+          </div>
+        </form>
+        <div class="klaviyo_messages">
+          <div class="success_message" style="display:none;"></div>
+          <div class="error_message" style="display:none;"></div>
+        </div>
+        <div id="email_subscribe"></div>        
+        <script type="text/javascript">
+          KlaviyoSubscribe.attachToForms('#email_signup_footer', {
+            hide_form_on_success: false,
+            success_message: "Please confirm the signing up, check your mail!"
+          });
+        </script>
+	<script defer type="text/javascript" src="//www.klaviyo.com/media/js/public/klaviyo_subscribe.js"></script>
+        {% else %}                
+        {%- assign formId = 'ContactForm_footer' -%}
+        {% form 'contact', id: formId , class: 'newsletter_form' %}
+        {% if form.errors %}
+        <p class="error feedback">
+          {% for field in form.errors %}
+          {{ field }} {{ form.errors.messages[field] }}
+          {% endfor %}
+        </p>
+        {% endif %}
+        <div class="subscribe-input">          
+          <input type="email" id="subscribe_input_footer" name="contact[email]" placeholder="{{ 'layout.footer.email_placeholder' | t }}" class="etext">
+          <button type="submit" class="sub_go">
+            {{ 'layout.footer.submit_btn' | t }}
+            {% include 'icons' with 'left-arrow' %}
+          </button> 
+          <p class="err_msg"></p>
+          {% if form.posted_successfully? %}
+          <p class="newsletter_success">{{ 'layout.footer.success' | t }}</p>
+          {% endif %}
+        </div>        
+        {% endform %}
+        {% endcase %}   
+
+//validation js
+<script>
+  $(document).ready(function () {
+    $('.newsletter_form').on('submit',function(e){          
+      $('.err_msg').empty();      
+      var x = true;                  
+      var mtext = $('#subscribe_input_footer');
+      var err_msg;
+      var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+      if(mtext.val().trim() == '' || !regex.test(mtext.val())) { 
+        if(err_msg == null){
+          err_msg = 'Please Enter Email';
+        }        
+        x = false;
+        $(mtext).css({'border-color':'red'});
+      }       
+
+      if( x == false){        
+        $(this).find('.err_msg').text(err_msg);
+        return false;
+      }
+    });    
+  });
+
+</script>
+
+
+//form settings
+{
+    "name": "Newsletter forms",
+    "settings": [
+      {
+        "type": "select",
+        "id": "newsletter_option",
+        "options": [
+          {
+            "value": "mailchimp",
+            "label": "Mailchimp"
+          },
+          {
+            "value": "klaviyo",
+            "label": "Klaviyo"
+          },
+          {
+            "value": "contact_form",
+            "label": "Contact Form"
+          }
+        ],
+        "label": "Newsletter option"
+      },
+      {
+        "type": "textarea",
+        "id": "action_url",
+        "label": "Mailchimp Action URL",
+        "info": "https:\/\/gmail.us10.list-manage.com\/subscribe\/post?u=c7199168e59b00941b7d16d40&amp;id=0872c1df62"
+      },
+      {
+        "type": "text",
+        "id": "klaviyo_id",
+        "label": "Klaviyo ID",
+        "info": "XZGwLa"
+      }
+    ]
+  }

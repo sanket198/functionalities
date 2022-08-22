@@ -1,0 +1,98 @@
+//html
+
+<div class="span9 articles" id="im_in">      
+      {% for article in blog.articles %}
+      <div class="article clearfix" data-a_title="{{ article.title | handleize | slice:'0' }}" data-a_day="{{ article.published_at | date: '%j' }}" data-a_year="{{ article.published_at | date: '%Y' }}">
+        <h1><a href="{{ article.url }}">{{ article.title }}</a> <span class="date" style="display: block;">{% assign published_at = article.published_at | date: format: 'short' %}{{ 'blogs.article.posted_on_date' | t: author: article.author, date: published_at }} {% if article.comments_enabled? %}, <span>{{ 'blogs.comments.comments_with_count' | t: count: article.comments_count }}</span>{% endif %}</span></h1>
+        {{ article.excerpt_or_content }}
+      </div>
+      {% unless forloop.last %}
+      <hr class="divider" />
+      {% endunless %}
+      {% endfor %}
+      
+    </div>
+
+//js
+
+<script>
+  $(document).ready(function(){
+    var defaulthtml = $('body').find("#im_in")[0].innerHTML;
+    $('#blog_filter').on('change',function(){
+      var val = $(this).val();
+      var i;
+      var alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];       
+      var now = new Date();   
+      var reorder;
+      reorder = [];
+      if($(this).val() == 'a-z'){
+        $('.articles').html(defaulthtml);
+        for(i = 0;i<alpha.length;i++){
+          var alphabet = alpha[i];
+          $('.articles .article').each(function(i,v){
+            var f_letter = $(this).data('a_title'); 
+            if(alphabet === f_letter){
+              reorder.push(v);
+            }        
+          });
+        }
+      }else if($(this).val() == 'z-a'){
+        $('.articles').html(defaulthtml);
+        var rev_alpha = alpha.reverse();
+        for(i = 0;i<rev_alpha.length;i++){
+          var rev_alphabet = rev_alpha[i];
+          $('.articles .article').each(function(i,v){
+            var rf_letter = $(this).data('a_title');                  
+            if(rev_alphabet === rf_letter){
+              reorder.push(v);
+            }        
+          });          
+        }
+      }else if($(this).val() == 'new-to-old'){
+        $('.articles').html(defaulthtml);
+        var start = now.getFullYear();
+        for(var ii = 0; ii < 2; ii++ ){          
+          var year = start - ii;          
+          var days = 0;
+          for(var iii = 1; iii <= 12; iii++ ){
+            var month = iii;
+            days = Math.round(((new Date(year, month))-(new Date(year, month-1)))/86400000) + days;
+          }                           
+          $('.articles .article').each(function(i,v){
+            var date_year = $(this).data('a_year');                   
+            var date_day = $(this).data('a_day');              
+            for(var d = 1;d<=days;d++){     
+              if(d === date_day && year === date_year){
+                reorder.push(v);
+              }        
+            }
+          });                    
+        }                     	
+      }else if($(this).val() == 'old-to-new'){  
+        $('.articles').html(defaulthtml);
+        var start_rev = now.getFullYear() - 1;
+        for(var ii = 0; ii < 2; ii++ ){          
+          var year = start_rev + ii;          
+          var days = 0;
+          for(var iii = 1; iii <= 12; iii++ ){
+            var month = iii;
+            days = Math.round(((new Date(year, month))-(new Date(year, month-1)))/86400000) + days;
+          }  
+          for(var d = 1;d<=days;d++){
+            $('.articles .article').each(function(i,v){
+              var date_year = $(this).data('a_year');                   
+              var date_day = $(this).data('a_day');  
+          
+              if(d === date_day && year === date_year){
+                reorder.push(v);
+              }                    
+            });          
+          }          
+        }     	
+      }else if(val == 'select'){   
+        $('.articles').html(defaulthtml);
+      }
+        $('.articles').html(reorder);
+    });
+  });  
+</script>

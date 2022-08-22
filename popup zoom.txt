@@ -1,0 +1,116 @@
+
+//product page image loop
+<div class="img_loop">        
+    <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original.jpg?v=1591854670" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original.jpg?v=1591854670" alt="">
+    <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_2.jpg?v=1591854659" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_2.jpg?v=1591854659" alt="">
+    <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_1.jpg?v=1591854660" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_1.jpg?v=1591854660" alt="">
+    <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_3.jpg?v=1591854660" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_3.jpg?v=1591854660" alt="">
+    <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_4.jpg?v=1591854660" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_4.jpg?v=1591854660" alt="">
+    <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_5.jpg?v=1591854661" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_5.jpg?v=1591854661" alt="">
+  </div>
+
+
+//popup code
+<div class="img_pop">	
+    <div class="pop_wrapper">
+      <div class="close_pop">
+        <span>X</span>
+      </div>
+      <div class="main_img">
+	<img class="featured_img" src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original.jpg?v=1591854670" alt="Main Image">
+        <div class="thumb_img_loop">
+            <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original.jpg?v=1591854670" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original.jpg?v=1591854670" alt="">
+            <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_2.jpg?v=1591854659" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_2.jpg?v=1591854659" alt="">
+            <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_1.jpg?v=1591854660" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_1.jpg?v=1591854660" alt="">
+            <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_3.jpg?v=1591854660" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_3.jpg?v=1591854660" alt="">
+            <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_4.jpg?v=1591854660" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_4.jpg?v=1591854660" alt="">
+            <img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_5.jpg?v=1591854661" data-img_url="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/original_5.jpg?v=1591854661" alt="">
+        </div>
+      </div>      
+    </div>
+  </div>
+
+//popup js
+<script>    
+    $(document).ready(function(){
+      $('.img_loop').on('click','img',function(e){
+        e.preventDefault();
+        var url = $(this).data('img_url');
+        $('.img_pop').find('.featured_img').attr('src',url);
+        $('.img_pop').find('img[data-img_url="'+ url +'"]').addClass('active_img');
+        setTimeout(function(){
+	$('body').addClass('pop_active');
+	
+        $('.img_pop').addClass('open_pop');
+},500);
+      }); 
+
+      $('.img_pop').on('click','.main_img .featured_img',function(e){
+        e.preventDefault();
+        $('body').removeClass('pop_active');
+        $('.img_pop').removeClass('open_pop');
+      });
+
+      $('.img_pop').on('click','.thumb_img_loop img',function(e){
+        e.preventDefault();
+        var url = $(this).data('img_url');
+        $('.img_pop .main_img').find('.featured_img').attr('src',url);
+      });
+
+      $('.img_pop').on('click','.close_pop',function(e){
+        e.preventDefault();
+        $('body').removeClass('pop_active');
+        $('.img_pop').removeClass('open_pop');
+      });
+    });
+  </script>
+
+//popup css
+body{
+  &.pop_active{
+  	overflow: hidden;
+  }
+}
+
+.img_pop{
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left:0;
+  right:0;
+  max-height: 100vh;
+  width: 100%;  
+  overflow: hidden;  
+  display: none;
+  cursor: zoom-out;
+  &.open_pop{
+  	display: block;
+  }
+  .close_pop{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+    font-size: 25px;
+    cursor: pointer;
+  }
+  .main_img{
+    position: relative;
+    z-index: 99;
+    .featured_img{
+      max-width: 100%;
+      max-height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+  }
+  .thumb_img_loop{
+    position: absolute;
+    z-index: 9999;
+    top: 0;
+    left: 50px;
+    max-width: 50px;
+    width: 50px;
+    cursor: default;
+  }
+}

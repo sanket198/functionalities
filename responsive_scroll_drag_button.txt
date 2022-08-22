@@ -1,0 +1,80 @@
+<div class="grid-container">
+  <div class="arrow-left">left</div>
+  <main class="grid-item main">
+    <div class="items">
+      <div class="item item1">1</div>
+      <div class="item item2">2</div>
+      <div class="item item3">3</div>
+      <div class="item item4">4</div>
+      <div class="item item5">5</div>
+      <div class="item item6">6</div>
+      <div class="item item7">7</div>
+      <div class="item item8">8</div>
+      <div class="item item9">9</div>
+      <div class="item item10">10</div>
+    </div>
+  </main>
+  <div class="arrow-right">right</div>
+</div>
+
+===========================================
+
+.items {
+position: relative;
+width: 100%;
+overflow-x: scroll;
+overflow-y: hidden;
+white-space: nowrap;
+transition: all 0.2s;
+transform: scale(0.98);
+will-change: transform;
+user-select: none;
+cursor:grab;
+}
+.item {
+display: inline-block;
+background: skyblue;
+margin: 2em 1em;
+width: 10%;
+text-align: center;
+}
+
+============================================
+
+$(document).ready(function(){
+  var widthitem = 100; 
+  $(".arrow-left").click(function(){
+    $(".items").animate({scrollLeft: "-="+widthitem});
+  });
+  $(".arrow-right").click(function(){
+    $(".items").animate({scrollLeft: "+="+widthitem});
+  }); 
+const slider = $('.items');
+let isDown = false;
+let startX;
+let scrollLeft;
+
+slider.on('mousedown', (e) => {
+  isDown = true;
+  slider.addClass('active');
+  startX = e.pageX - slider.offsetLeft;
+  scrollLeft = slider.scrollLeft;
+});
+slider.on('mouseleave', () => {
+  isDown = false;
+  slider.removeClass('active');
+});
+slider.on('mouseup', () => {
+  isDown = false;
+  slider.removeClass('active');
+});
+slider.on('mousemove', (e) => {
+  if(!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - slider.offsetLeft;
+  const walk = (x - startX) * 3; //scroll-fast
+  slider.scrollLeft = scrollLeft - walk;
+  console.log(walk);
+});
+  
+});

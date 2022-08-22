@@ -1,0 +1,362 @@
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.0/slick.min.js" ></script>
+
+<style>
+.main_slider{
+      max-width: 515px;
+    width: 100%;
+}
+  .slick-slider {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -khtml-user-select: none;
+    -ms-touch-action: pan-y;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .slick-list {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  .slick-list:focus {
+    outline: none;
+  }
+  .slick-list.dragging {
+    cursor: pointer;
+    cursor: hand;
+  }
+  .slick-slider .slick-track,
+  .slick-slider .slick-list {
+    -webkit-transform: translate3d(0, 0, 0);
+    -moz-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+    -o-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  .slick-track {
+    position: relative;
+    top: 0;
+    left: 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .slick-track:before,
+  .slick-track:after {
+    display: table;
+    content: "";
+  }
+  .slick-track:after {
+    clear: both;
+  }
+  .slick-loading .slick-track {
+    visibility: hidden;
+  }
+  .slick-slide {
+    display: none;
+    float: left;
+    height: 100%;
+    min-height: 1px;
+  }
+  [dir="rtl"] .slick-slide {
+    float: right;
+  }
+  .slick-slide img {
+    display: block;
+  }
+  .slick-slide.slick-loading img {
+    display: none;
+  }
+  .slick-slide.dragging img {
+    pointer-events: none;
+  }
+  .slick-initialized .slick-slide {
+    display: block;
+    outline: none;
+  }
+  .slick-loading .slick-slide {
+    visibility: hidden;
+  }
+  .slick-vertical .slick-slide {
+    display: block;
+    height: auto;
+    border: 1px solid transparent;
+  }
+  .slick-arrow.slick-hidden {
+    display: none;
+  }
+  .slick-dots {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  .slick-dots li:not(:last-child) {
+    margin-right: 10px;
+  }
+  .slick-dots li {
+    display: flex;
+  }
+  .slick-dots li button {
+    font-size: 0;
+    line-height: 1;
+    background-color: var(--theme-color);
+      border: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      }
+  .slick-dots li.slick-active button {
+    background-color: var(--theme-color1);
+      }
+  .slick-arrow {
+    width: 28px;
+    height: 47px;
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    font-size: 0;
+    border: 0;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+    z-index: 2;
+    background-image: url(https://cdn.shopify.com/s/files/1/0622/5333/4772/files/right-arrow.svg?v=1647834264);
+    background-repeat: no-repeat !important;
+    background-position: 50% 50%;
+    background-size: cover;
+    border-radius: 0;
+    padding: 0;
+    background-color: transparent !important;
+  }
+  .slick-disabled {
+    opacity: 0.6;
+  }
+  .slick-arrow.slick-next {
+    right: 0;
+    left: auto;
+  }
+  .slick-arrow.slick-prev {
+    right: auto;
+    transform: translateY(-50%) scale(-1);
+    left: 0;
+  }
+  .slick-arrow:focus,
+  .slick-arrow:hover {
+    background-color: transparent;
+  }
+</style>
+
+<div class="Slider_main">
+  <div class="main_slider">
+    <div class="custom_video">
+      {% for media in product.media %}
+      {% case media.media_type %}
+{% when 'image' %}
+<div class="product-slide-inner" >
+  <div class="prod-slide">
+     {% assign new_id = 'media_id' | append: forloop.index %}
+    <a  href="{{ media | img_url:'1400x' }}" data-gallery="group">
+      <img src="{{ media | img_url:'300x300' }}" alt="{{ product.title }}">
+    </a>
+  </div>
+</div>
+{% when 'external_video' %}
+<div class="product-slide-inner" data-slide-type="{{ media.host }}" data-video-id="{{ media.external_id }}" data-product-media-type-video>
+  <div class="prod-slide">
+    {{ media | external_video_tag }}
+  </div>
+</div>
+{% when 'video' %}
+<div class="product-slide-inner" data-product-media-type-video> 
+  <div class="prod-slide">
+    {{ media | video_tag: class: 'media-video', controls: true ,autoplay: true ,image_size: image_size }}
+  </div> 
+</div>
+{% when 'model' %}
+<div class="product-slide-inner" data-product-media-type-model>
+  <div class="prod-slide">
+    {{ media | model_viewer_tag: image_size: image_size, reveal: 'interaction', toggleable: true, data-model-id: media.id }}
+  </div>
+</div>
+{% else %}
+<div class="product-slide-inner">
+  <div class="prod-slide">
+    {{ media | media_tag: class: 'media-item', image_size: image_size }}
+  </div>
+</div>
+{% endcase %}
+
+      {% endfor %}
+    </div>
+  </div>
+  {% if product.media.size > 1 %}
+  <div class="thumb_nail_slider">
+    <div class="thumbnails-wrapper">
+      {% for media in product.media %}
+      <a data-thumbnail-id="{{ media.id }}">
+        <img class="product-single__thumbnail-image" src="{{ media | img_url: '110x110', scale: 2 }}" alt="{{ media.alt }}">
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  var slideWrapper = $(".custom_video"),
+      iframes = slideWrapper.find('.embed-player'),
+      lazyImages = slideWrapper.find('.slide-image'),
+      lazyCounter = 0;
+  function postMessageToPlayer(player, command){
+    if (player == null || command == null) return;
+    player.contentWindow.postMessage(JSON.stringify(command), "*");
+  }
+  function playPauseVideo(slick, control){
+    var currentSlide, slideType, startTime, player, video;
+
+    currentSlide = slick.find(".slick-current");
+    slideType = currentSlide.attr('data-slide-type');
+    player = currentSlide.find("iframe").get(0);
+    startTime = parseInt(1);
+    if (slideType === "vimeo") {
+      switch (control) {
+        case "play":
+          if ((startTime != null && startTime > 0 ) && !currentSlide.hasClass('started')) {
+            currentSlide.addClass('started');
+            postMessageToPlayer(player, {
+              "method": "setCurrentTime",
+              "value" : startTime
+            });
+          }
+          postMessageToPlayer(player, {
+            "method": "play",
+            "value" : 1
+          });
+          break;
+        case "pause":
+          postMessageToPlayer(player, {
+            "method": "pause",
+            "value": 1
+          });
+          break;
+      }
+    } else if (slideType === "youtube") {
+      switch (control) {
+        case "play":
+          postMessageToPlayer(player, {
+            "event": "command"
+          });
+          postMessageToPlayer(player, {
+            "event": "command",
+            "func": "playVideo"
+          });
+          break;
+        case "pause":
+          postMessageToPlayer(player, {
+            "event": "command",
+            "func": "pauseVideo"
+          });
+          break;
+      }
+    } else if (slideType === "video") {
+      video = currentSlide.children("video").get(0);
+      if (video != null) {
+        if (control === "play"){
+          video.play();
+        } else {
+          video.pause();
+        }
+      }
+    }
+  }
+
+  // Resize player
+  function resizePlayer(iframes, ratio) {
+    if (!iframes[0]) return;
+    var win = $(".custom_video"),
+        width = win.width(),
+        playerWidth,
+        height = win.height(),
+        playerHeight,
+        ratio = ratio || 16/9;
+
+    iframes.each(function(){
+      var current = $(this);
+      if (width / ratio < height) {
+        playerWidth = Math.ceil(height * ratio);
+        current.width(playerWidth).height(height).css({
+          left: (width - playerWidth) / 2,
+          top: 0
+        });
+      } else {
+        playerHeight = Math.ceil(width / ratio);
+        current.width(width).height(playerHeight).css({
+          left: 0,
+          top: (height - playerHeight) / 2
+        });
+      }
+    });
+  }
+
+  // DOM Ready
+  $(function() {
+    // Initialize
+    slideWrapper.on("init", function(slick){
+      slick = $(slick.currentTarget);
+      setTimeout(function(){
+        playPauseVideo(slick,"play");
+      }, 1000);
+      resizePlayer(iframes, 16/9);
+    });
+    slideWrapper.on("beforeChange", function(event, slick) {
+      slick = $(slick.$slider);
+      playPauseVideo(slick,"pause");
+    });
+    slideWrapper.on("afterChange", function(event, slick) {
+      slick = $(slick.$slider);
+      playPauseVideo(slick,"play");
+    });
+    slideWrapper.on("lazyLoaded", function(event, slick, image, imageSource) {
+      lazyCounter++;
+      if (lazyCounter === lazyImages.length){
+        lazyImages.addClass('show');
+        // slideWrapper.slick("slickPlay");
+      }
+    });
+    //start the slider
+    slideWrapper.slick({
+      // fade:true,
+      autoplaySpeed:4000,
+      lazyLoad:"progressive",
+      speed:600,
+      arrows:false,
+      infinite: false,
+      draggable: false,
+      dots:false,
+      asNavFor: '.thumbnails-wrapper'
+    });
+    $('.thumbnails-wrapper').slick({
+      slidesToShow: 4,
+      slidesToScroll: 1,
+      asNavFor: slideWrapper,
+      dots: false,
+      infinite: false,
+      centerMode: false,
+      focusOnSelect: true,
+      arrows: true
+    });
+  });
+  // Resize event
+  $(window).on("resize.slickVideoPlayer", function(){  
+    resizePlayer(iframes, 16/9);
+  });
+</script>

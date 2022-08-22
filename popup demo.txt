@@ -1,0 +1,94 @@
+ <div><a href="lightbox_code" class="popupinfo"><img src="https://cdn.shopify.com/s/files/1/0160/3275/9862/files/insta1.jpg?v=1559985302" alt="img"></a></div>    
+
+    <div class="popupOverlay lightbox_code">
+      <div class="popupBox">
+        <a class="cls_popup" >X</a>
+        <div class="lightbox_selection">
+          <img src="" alt="">
+        </div>
+      </div>
+    </div>
+
+
+.popupOverlay {
+  display: none;
+}
+.popupOverlay {
+  background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9991;
+  text-align:center;
+}
+.popupBox {
+  background: transparent none repeat scroll 0 0;
+  border: 0px solid #ccc;  
+  padding: 20px;
+  z-index: 9999;
+  margin: 100px auto 0;
+  max-width: 600px;
+  position: relative;
+  max-height: 80vh;
+  overflow: auto;
+}
+.cls_popup {
+  color: #999;
+  cursor: pointer;
+  
+  position: absolute;
+  right: 9px;
+  top: 5px;
+  text-decoration:none !important;
+}
+body.popupOpen {
+  overflow: hidden;
+}
+
+
+
+$(document).ready(function(){  
+  
+function closePopup() {
+    $('.popupBox').removeClass('slideInDown');
+    $('.popupBox').addClass('slideOutUp');
+    $('.popupOverlay').fadeOut('slow');
+    $('body').removeClass('popupOpen');
+  }
+  
+  
+  function openPopup(a) {
+    $('.popupBox').addClass('slideInDown');
+    $('.popupBox').removeClass('slideOutUp');
+    $('.popupOverlay.'+a).fadeIn('slow');
+    $('body').addClass('popupOpen');
+  }
+  $('body').on('click','.popupinfo',function(e){
+    e.preventDefault();
+    var id = $(this).attr('href');
+    var src = $(this).find('img').attr('src');    
+    $('.'+id).find('.lightbox_selection img').attr('src',src);
+    openPopup(id);
+  });
+  $('body').on('click','.cls_popup',function(e){
+    e.preventDefault();
+    closePopup();
+  });
+  
+  $('body').on('click','.popupOverlay',function(e){
+    e.preventDefault();
+    closePopup();
+  });
+  $(document).keyup(function(e) {
+    if (e.keyCode == 27) { 
+      closePopup();
+    }
+  });
+  window.onclick = function(e) {
+    if ($(e.target).hasClass('popupOverlay')) {
+      closePopup();
+    }  
+  } 
+     });

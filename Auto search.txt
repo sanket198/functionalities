@@ -1,0 +1,209 @@
+//include this html in search form
+		
+		<div class="search_result desktop_search_content" data-resource="{{ settings.search_val }}">
+
+            </div>
+
+//settings_schema
+{
+    "name": "search",
+    "settings": [
+      {
+        "type": "text",
+        "id": "search_val",
+        "label": "Search reasources",
+	"default": "product,page,article,collection"
+      }
+    ]
+  }
+
+ //custom search jquery
+  
+  var s_val = [];
+  var arr = $('input[name="q"]').data('resource'); 
+  var res = s_val.push(arr.split(",")); 	
+  $('body').on('keyup focus','input[name="q"]',function(){    
+    var q = $(this).val();    
+    if(q == ''){     
+      $('.desktop_search_content').removeClass('active');
+      $('.search_overlay').removeClass('active');
+    }else{
+    jQuery.getJSON("/search/suggest.json", {
+      "q": q,
+      "resources": {
+        "type": arr,
+        "limit": 10,
+        "options": {
+          "unavailable_products": "last",
+          "fields": "title,product_type,variants.title"
+        }            
+      }
+    }).done(function(response) { 
+      $('.desktop_search_content').addClass('active');
+      $('.search_overlay').addClass('active');
+      var productSuggestions = response.resources.results.products;
+          var pages = response.resources.results.pages;
+          var article = response.resources.results.articles; 
+          var collection = response.resources.results.collections;       
+          $('.search_result').empty();
+          if(collection.length > 0){
+            $(collection).each(function(i,v){
+              if(i == 0){
+                $('.search_result').append('<div class="res_wrap collection"><div class="res_head"><h2>Collections</h2></div><div class="res_content"></div></div>');            
+              }          
+              $('.search_result .collection .res_content').append('<a href="'+ v.url +'"><div class="flex_wrap_'+i+' content_box"></div></a>');
+              $('.search_result .collection .flex_wrap_'+i+'').append('<div class="res_desc"><p><b class="res_title">'+ v.title +'</b></p></div>'); 
+              if(i == 2){
+                return false;
+              }
+            });
+          }
+
+      if(productSuggestions.length > 0){
+        $(productSuggestions).each(function(i,v){
+          if(i == 0){
+            $('.search_result').append('<div class="res_wrap product"><div class="res_head"><h2>Product</h2></div><div class="res_content"></div></div>');
+          }          
+          $('.search_result .product .res_content').append('<a href="'+ v.url +'"><div class="flex_wrap_'+i+' content_box"></div></a>');
+          $('.search_result .product .flex_wrap_'+i+'').append('<div class="res_img"><img src="'+ v.image +'" alt="'+ v.title +'"></div><div class="res_desc"><p><b class="res_title">'+ v.title +'</b></p><p class="res_price"><span class="money">'+ v.price +'&nbsp;&nbsp;<del>'+v.compare_at_price_max+'</del></span></p></div>');          
+          if(i == 4){
+          	return false;
+          }
+        });
+      }
+      
+      if(article.length > 0){
+        $(article).each(function(i,v){
+
+          if(i == 0){
+            $('.search_result').append('<div class="res_wrap articles"><div class="res_head"><h2>Articles</h2></div><div class="res_content"></div></div>');
+          }           
+
+          $('.search_result .articles .res_content').append('<a href="'+ v.url +'"><div class="flex_wrap_'+i+' content_box"></div></a>');
+          $('.search_result .articles .flex_wrap_'+i+'').append('<div class="res_img"><img src="'+ v.image +'" alt="'+ v.title +'"></div><div class="res_desc"><p><b class="res_title">'+ v.title +'</b></p></div>');          
+          if(i == 2){
+            return false;
+          }
+        });
+      }
+
+        $(pages).each(function(i,v){
+          
+          if(i == 0){
+            $('.search_result').append('<div class="res_wrap pages"><div class="res_head"><h2>Pages</h2></div><div class="res_content"></div></div>');
+          }           
+          
+          $('.search_result .pages .res_content').append('<a href="'+ v.url +'"><div class="flex_wrap_'+i+' content_box"></div></a>');
+          $('.search_result .pages .flex_wrap_'+i+'').append('<div class="res_desc"><p><b class="res_title">'+ v.title +'</b></p></div>');          
+          if(i == 1){
+          	return false;
+          }
+        });
+	  if( collection.length > 0 || productSuggestions.length > 0 || article.length > 0 || pages.length > 0 ){      	
+            $('.search_result').append('<div class="see_more_btn"><button>See More..</button></div>');        
+          }else{
+            $('.search_result').append('<div class="res_wrap product"><div class="res_head"><h2>No Result Found ..!</h2></div></div>');              
+          }       
+    });
+  }
+  });  
+  
+  $('.search_result').on('click','.see_more_btn',function(){
+  	$(this).closest('form').submit();
+  });
+
+
+
+//css
+
+
+.search_result{
+  display: none;
+  min-width: 400px;
+  width: auto;
+  position: absolute;
+  z-index: 999999;
+  background-color: #fff;
+  right:0;
+  top:35px;
+  &.active{
+  	display: block;
+  }
+  @media screen and (max-width: 767px) {
+    right: 40px;
+    top: 45px;
+    min-width: 600px;
+  }
+  @media screen and (max-width: 630px) {
+    right: 0px;    
+    min-width: 10px;
+    width: 100%;    
+	padding: 0 20px;
+  }
+  .res_wrap{  
+    .res_head{
+      margin: 1px 0 5px 0;
+      background-color: #0b2626;
+      h2{
+        padding: 0px 15px;
+        color: #fff;
+        font-weight: normal;
+        font-size: 15px;
+      }
+    }
+    .res_content{
+      .content_box{
+        padding: 5px 10px;
+        display: flex;
+        justify-content: space-between;
+        text-align: left;
+        align-items: center;
+        border-bottom: 1px solid #eee;        
+        .res_img{
+          flex:0 0 20%;
+          margin-right: 5px;
+          margin-right: 10px;
+          text-align: center;
+          align-items: center;
+          img{
+            max-height:50px;
+            max-width: 50px;
+            width: 100%;
+          }
+        }
+        .res_desc{      	
+          flex:0 0 80%;
+          max-width: 80%;
+          margin-left: 5px;
+          padding-right:10px;
+          color: #a9986d;          
+          p{
+            line-height: 1.4;
+            margin-bottom: 5px;
+            word-break: break-word;
+          }
+        }
+        &:hover{
+          background-color: #0097cf;
+          .res_desc{  
+           	color: #fff; 
+          }
+        }
+      }
+    }
+  }  
+  .see_more_btn{
+    button{
+      width: 100%;
+      padding: 10px 5px;
+      border: none;
+      background-color: #0b2626;
+      color: #fff;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    @media screen and (max-width: 767px) {
+      margin-bottom: 10px; 
+    }
+  }
+}
