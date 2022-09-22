@@ -1,0 +1,30 @@
+jQuerycs.getJSON(window.csapps.aiod_root_url + '/cart.js?csapp=aiod', function (cdata) {
+                    jQuerycs.getJSON(window.csapps.aiod_root_url + '/payments/config?csapp=aiod', function (data) {
+                        var main_check = {}, body_obj = {};
+                        body_obj.discount_code = csapp_code;
+                        body_obj.line_items = cdata.items;
+                        body_obj.presentment_currency = window.csapps.currency_code;
+                        main_check.checkout = body_obj;
+                        main_check = JSON.stringify(main_check);
+                        jQuerycs.ajax({
+                          type: "POST",
+                          url: "/wallets/checkouts/?locale="+ window.csapps.aiod_lang_code + "&csapp=aiod",
+                          timeout: cart_call_timeout,
+                          dataType: 'json',
+                          async: false,
+                          data: main_check,
+                          headers: {
+                            "Content-Type": "application/json",
+                            "authorization": "Basic " + btoa(data.paymentInstruments.accessToken),
+                            "cache-control": "no-cache",
+                            "pragma": "no-cache",
+                            "Alt-Used": window.csapps.store_domain,
+                          },
+                          referrer: "https://" + window.csapps.store_domain + "/",
+                          credentials: "include",
+                          success: function (data) {
+                            console.log(data.checkout);
+                          }
+                        });
+                     }); 
+                  });
