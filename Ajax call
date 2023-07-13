@@ -1,0 +1,17 @@
+async function getotp(){
+  let response = await fetch('https://flow-builder.limechat.ai/builder/v1/event/create', {
+    method: 'POST',    
+    headers: { 'x-limechat-access-token': 'ah2mu9hcNjXr8k72RRDwMLJbwEocDWlojPUReHI4Mka7nBKGtL2ZG4P3uU8qLhta','Content-Type': 'application/json' },
+    body: JSON.stringify({
+      "event_type": eventName,
+      "phone": e.detail['mobileNumber'],
+      "user_identity": e.detail['mobileNumber'],
+      "data": evdetails
+    })
+  });
+  const data = await response.json();
+  return data;
+}
+getotp().then(data => {
+  console.log(data);
+});
