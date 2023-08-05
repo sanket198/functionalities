@@ -1,0 +1,23 @@
+// NUMBER LIMITATION
+
+<input type="number" name="properties[Length]" class="mtm-input" min="15" max="99" oninput="maxLengthCheck(this)" onkeypress="return event.charCode >= 48 && event.charCode <= 57" id="lengthInput"  />
+<script>
+  // This is an old version, for a more recent version look at
+  // https://jsfiddle.net/DRSDavidSoft/zb4ft1qq/2/
+  function maxLengthCheck(object){         
+      if(parseInt(object.value) < parseInt(object.min)){        
+        object.value = object.value.slice(0, 1);
+      }    
+      if(parseInt(object.value) > parseInt(object.max)){      
+        object.value = object.value.slice(0, 1);
+      }
+  }
+  $("body").on("focusout", "#breadthInput, #lengthInput", function() {
+      if(parseInt(this.value) < parseInt(this.min)){
+        this.value = this.value.slice(1, 1);
+      }
+      if(parseInt(this.value) > parseInt(this.max)){
+        this.value = this.value.slice(0, 1);
+      }
+  });
+</script>
