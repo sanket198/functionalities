@@ -174,6 +174,63 @@
   </div>
 {% endif %}
 
+//// Setting
+
+{
+  "type": "header",
+  "content": "Discount threshhold"
+},
+{
+  "type": "text",
+  "id": "default_message",
+  "label": "Default message"
+},
+{
+  "type": "text",
+  "id": "first_threshhold",
+  "label": "First threshhold price"
+},
+{
+  "type": "text",
+  "id": "first_threshhold_message",
+  "label": "First unlock message"
+},
+{
+  "type": "text",
+  "id": "first_threshhold_short_message",
+  "label": "First unlock Short message"
+},
+{
+  "type": "text",
+  "id": "second_threshhold",
+  "label": "Second threshhold price"
+},
+{
+  "type": "text",
+  "id": "second_threshhold_message",
+  "label": "Second unlock message"
+},
+{
+  "type": "text",
+  "id": "second_threshhold_short_message",
+  "label": "Second unlock short message"
+}, 
+{
+  "type": "textarea",
+  "id": "third_threshhold",
+  "label": "Third threshhold price"
+},
+{
+  "type": "text",
+  "id": "third_threshhold_short_message",
+  "label": "Third unlock short message"
+},
+{
+  "type": "text",
+  "id": "success_message",
+  "label": "Success message"
+}
+
 
 ////// CSS
 
