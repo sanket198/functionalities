@@ -1,0 +1,5 @@
+var scroll = $(this).closest('.coll-tab-list').scrollLeft();
+var position = $(this).position();
+$(this).closest('.coll-tab-list').animate({
+    'scrollLeft': scroll + position.left - 30
+}, 200);  
