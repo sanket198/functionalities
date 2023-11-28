@@ -1,0 +1,273 @@
+/////////////////////////////////// JS ////////////////////////////////////////
+
+sharePopup: function(exports){
+    var sharePopup = document.querySelector('.share_pp');
+    if(!sharePopup) return exports;
+    var fineprint = document.querySelector('.sh_fine_print ');
+
+    decorate(sharePopup, [{
+      key: 'hide',
+      value: function(){
+        this.classList.add('opacity_hidden')
+        setTimeout(function(that){ that.classList.add('away') }, 400, this)
+      }
+    },
+    {
+      key: 'listenForLIShare',
+      value: function(){
+        var btn = document.querySelector('.top_banner .cta a')
+
+        btn.addEventListener('click', function(event){
+          event.preventDefault()
+          window.open('https://www.linkedin.com/uas/oauth2/authorization?response_type=code&client_id=86p183e6dtvtap&redirect_uri='+encodeURIComponent('http://brester.tech')+'&state=asdasdqqqfgsdfdasd12312as&scope=r_liteprofile%20w_member_social')
+        })
+
+        /*
+        if(getParameterByName('code')){
+          window.location.replace('https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code='+getParameterByName('code')+'&redirect_uri='+encodeURIComponent('https://' + location.host + location.pathname)+'&client_id=86p183e6dtvtap&client_secret=le6GRNR1zksdrQs8')
+        }
+        */
+      }
+    }])
+
+    var closeBtn = sharePopup.querySelector('.close_btn')
+
+    closeBtn && closeBtn.addEventListener('click', function(){
+      sharePopup.hide()
+      exports.dummyWindow.unfix()
+    })
+
+    var initiated = false
+
+    var handler = function(res){
+      if(res && !res.error_message){
+        sharePopup.hide()
+        exports.discountPopup.startCountdown()
+        exports.discountPopup.show()
+      } else {
+        sharePopup.hide()
+        exports.errorPopup.show()
+      }
+    }
+
+    var shareBtn = sharePopup.querySelector('.sh_close_pp')
+    shareBtn && shareBtn.addEventListener('click', function(){
+      fineprint.classList.remove('opacity_hidden')
+
+      if(!initiated){
+        initiated = true
+
+        window.fbAsyncInit = function(){
+          FB.ui({
+            method: 'share',
+            title: 'Sunday Manifacturing',
+            description: 'Sunday Manifacturing video', 
+            href: sharePopup.getAttribute('data-link')
+          }, handler)
+        }
+
+        appendScript("https://connect.facebook.net/en_US/sdk/debug.js#version=v3.3&appId=436327899862629&status=true&cookie=true&xfbml=false", {})
+      } else {
+        FB.ui({
+          method: 'share',
+          href: sharePopup.getAttribute('data-link')
+        }, handler)
+      }
+    })
+
+    exports.sharePopup = sharePopup
+
+    return exports;
+  },
+  discountPopup: function(exports){
+    var discountPopup = document.querySelector('.discount_pp')
+
+    if(!discountPopup) return exports
+
+    var daysText = discountPopup.querySelector('.sh_timer_sec:nth-child(1) .sh_timer_numbers')
+    var hoursText = discountPopup.querySelector('.sh_timer_sec:nth-child(2) .sh_timer_numbers')
+    var minutesText = discountPopup.querySelector('.sh_timer_sec:nth-child(3) .sh_timer_numbers')
+    var secondsText = discountPopup.querySelector('.sh_timer_sec:nth-child(4) .sh_timer_numbers')
+
+    decorate(discountPopup, [{
+      key: 'show',
+      value: function(){
+        this.classList.remove('away')
+        setTimeout(function(that){ that.classList.remove('opacity_hidden')}, 50, this)
+      }
+    },
+    {
+      key: 'hide',
+      value: function(){
+        this.classList.add('opacity_hidden')
+        setTimeout(function(that){ that.classList.add('away')}, 400, this)
+      }
+    },
+    {
+      key: 'startCountdown',
+      value: function(){
+        var date = new Date(this.getAttribute('data-date'))
+
+        var showTime = function(){
+          var now = new Date()
+          var diff = date.getTime() - now.getTime()
+
+          daysText.textContent = zeroes(Math.floor(diff / (1000 * 3600 * 24 )))
+          hoursText.textContent = zeroes(Math.floor((diff % (1000 * 3600 * 24 )) / (1000 * 3600)))
+          minutesText.textContent = zeroes(Math.floor((diff % (1000 * 3600 )) / (1000 * 60)))
+          secondsText.textContent = zeroes(Math.floor((diff % (1000 * 60 )) / (1000)))
+        }
+
+        showTime()
+
+        this.interval = setInterval(showTime, 1000)
+      }
+    },
+    {
+      key: 'stopCountdown',
+      value: function(){
+        clearInterval(this.interval);
+      }
+    }])
+
+    discountPopup.querySelectorAll('.sh_close_pp, .close_btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        discountPopup.stopCountdown();
+        discountPopup.hide();
+        exports.dummyWindow.unfix();
+      })
+    })
+
+    exports.discountPopup = discountPopup
+
+    return exports
+  },
+  errorPopup: function(exports){
+    var errorPopup = document.querySelector('.pp_error')
+
+    if(!errorPopup) return exports
+
+    decorate(errorPopup, [{
+      key: 'show',
+      value: function(){
+        this.classList.remove('away')
+        setTimeout(function(that){ that.classList.remove('opacity_hidden')}, 50, this)
+      }
+    },
+    {
+      key: 'hide',
+      value: function(){
+        this.classList.add('opacity_hidden')
+        setTimeout(function(that){ that.classList.add('away')}, 200, this)
+        exports.dummyWindow.unfix()
+      }
+    }])
+
+    errorPopup.querySelector('.close_pp').addEventListener('click', function(){
+      errorPopup.hide()
+    })
+
+    var handler = function(res){
+      if(res && !res.error_message){
+        errorPopup.hide()
+        exports.discountPopup && exports.discountPopup.startCountdown()
+        exports.discountPopup && exports.discountPopup.show()
+      }
+    }
+
+    errorPopup.querySelector('.retry_pp').addEventListener('click', function(){
+      FB.ui({
+        method: 'share',
+        href: exports.sharePopup.getAttribute('data-link')
+      }, handler)
+    })
+
+    exports.errorPopup = errorPopup
+
+    return exports;
+  },
+
+
+///////////////////////////////// HTML  ////////////////////////////////
+
+<div id="shopify-section-popup-share" class="shopify-section"><div class="pp1_wrp share_pp opacity_hidden opacity_transtition away cheap-scrolling" data-link="https://www.facebook.com/MySundayRest/videos/1161260290641975/">
+  <div class="sh_pp_wrp scrolling-element">
+    <div class="close_btn">
+      <img src='' data-c-src="//www.sundayrest.com/cdn/shop/t/207/assets/X_icon-01.svg?v=38802389961149276931700716247" alt="Close Button Image" class='share_close_btn_img' data-high-priority='true'>
+    </div>
+    <div data-changable="true" class="sh_title">Share about us on FB & get a Pillow!</div>
+    <div data-changable="true" class="sh_pp_txt">Get our award winning Sunday Delight Pillow complimentary with mattress. Joy of sharing!</div>
+    <div class="sh_pp_image_wrp">
+      <img src='' data-c-src="//www.sundayrest.com/cdn/shop/t/207/assets/Viddeo_Thumb.png?v=115663881596404276981700716217" alt="">
+    </div>
+    <div data-changable="true" class="sh_pp_txt"><i>Just a cool video of robots making our mattress in Belgium. Your friends will 💖💖</i></div>
+    <div class="social_icons_wrp" style='display: none;'>
+      
+      <div class="sh_social_container">
+        <div class="sh_soc_icon_wrp">
+          <img src='' data-c-src="//www.sundayrest.com/cdn/shop/t/207/assets/Fb_Icon.svg?v=44966634930394142801700715630" alt="" data-high-priority='true'>
+          <div class="check_icon">
+            <img src='' data-c-src="//www.sundayrest.com/cdn/shop/t/207/assets/Check_Icon-01.svg?v=60079858738901303521700715517" alt="" class="fb_check_ic" data-high-priority='true'>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div data-changable="true" class="btn sh_close_pp w-button">Share</div>
+    <div data-changable="true" class="sh_fine_print opacity_transtition opacity_hidden">Pop-ups blocked? Don't worry, just click on "share" again.</div>
+  </div>
+</div>
+
+
+</div>
+      <div id="shopify-section-popup-discount" class="shopify-section">
+
+<div class="pp1_wrp discount_pp opacity_hidden opacity_transtition away cheap-scrolling" data-date='2023-11-29T23:59:00.000+05:30'>
+    <div class="sh_pp2_wrp scrolling-element">
+      <div data-changable="true" class="sh_title">Thank you!</div>
+      <div data-changable="true" class="sh_pp_txt">Here's the code for our Delight Pillow</div>
+      <div class='code_copy_wrapper'>
+        <div class="sh_code_wrp">
+          <div data-changable="true" class="sh_code">FACEBOOK-WGWQV</div>
+        </div>
+        <div class='copy_wrapper'>
+          <img class='copy_icon' src="//www.sundayrest.com/cdn/shop/t/207/assets/icon-copy-content.svg?v=136016629422184593251700715730" alt='Copy Promo Code Buttom Image'>
+          <div class='copy_confirm transform_transition opacity_transtition opacity_hidden'>Copied!</div>
+        </div>
+      </div>
+      <div class="sh_timer_wrp">
+        <div class="sh_timer_sec">
+          <div data-changable="true" class="sh_timer_numbers">0</div>
+          <div data-changable="true" class="sh_timer_indicator">Days</div>
+        </div>
+        <div class="sh_timer_sec">
+          <div data-changable="true" class="sh_timer_numbers">13</div>
+          <div data-changable="true" class="sh_timer_indicator">hours</div>
+        </div>
+        <div class="sh_timer_sec">
+          <div data-changable="true" class="sh_timer_numbers">39</div>
+          <div data-changable="true" class="sh_timer_indicator">minutes</div>
+        </div>
+        <div class="sh_timer_sec">
+          <div data-changable="true" class="sh_timer_numbers">1</div>
+          <div data-changable="true" class="sh_timer_indicator">seconds</div>
+        </div>
+      </div>
+      <div data-changable="true" class="sh_fine_print">The offer is valid when the order contains a Sunday mattress & a Delight Pillow (standard). This is a limited period & limited stock offer. This offer cannot be clubbed with other offers including 0% EMI, Friend referral etc.</div>
+      <a href="https://sundayrest.com/discount/FACEBOOK-WGWQV?redirect=/" data-changable="true" class="btn sh_close_pp pp2_btn w-button">Avail</a>
+    </div>
+  </div>
+
+  
+</div>
+      <div id="shopify-section-popup-error" class="shopify-section"><div class="pp1_wrp pp_error opacity_hidden opacity_transtition away">
+  <div class="popupic_wrp">
+    <div data-changable="true" class="subtitle">Oops, something went wrong!</div>
+    <div data-changable="true" class="pp_txt">Looks like you did not manage to share the video. We will only share the Sunday video and do not have any other access to your account or data. Click on "retry" to avail the cash back offer.</div>
+    <div class="btn retry_pp w-button">retry</div>
+    <div class="btn close_pp w-button">close</div>
+  </div>
+</div>
+
+
+</div>
+    
