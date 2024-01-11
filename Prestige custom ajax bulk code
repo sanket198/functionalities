@@ -1,0 +1,54 @@
+$('body').on('click','.fbt-product-bundle__cta', function(){    
+    var _this = $(this);
+    _this.attr("disabled", "disabled");
+    _this.attr("aria-busy", "true");
+    document.documentElement.dispatchEvent(new CustomEvent("theme:loading:start", { bubbles: true }));
+    var items = [];
+    $(this).parents('.fbt-section').find('.fbt-item').each(function(i,v){
+       var val = $(this).attr('data-vid');         
+       items.push({
+        quantity: 1,
+        id: val
+       });
+    });    
+    
+    var data = {items};
+    let sectionsToBundle = [];
+    document.documentElement.dispatchEvent(new CustomEvent("cart:prepare-bundled-sections", { bubbles: true, detail: { sections: sectionsToBundle } }));
+    data["sections"] = sectionsToBundle.join(",");
+    
+    fetch('/cart/add.js', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(function(data) {
+      _this.removeAttr("disabled");
+      _this.removeAttr("aria-busy");
+      $.getJSON('/cart.js', function(cart){
+        cart["sections"] = data["sections"];
+        document.documentElement.dispatchEvent(new CustomEvent("variant:add", {
+          bubbles: true,
+          detail: {
+            items: cart['items'],
+            cart: cart,
+            onSuccessDo: null
+          }
+        }));
+        document.documentElement.dispatchEvent(new CustomEvent("cart:change", {
+          bubbles: true,
+          detail: {
+            baseEvent: "variant:add",
+            onSuccessDo: null,
+            cart: cart
+          }
+        }));  
+        document.documentElement.dispatchEvent(new CustomEvent("theme:loading:end", { bubbles: true }));
+      });      
+    }.bind(this));  
+  });
