@@ -1,0 +1,52 @@
+///////////////// product.json.liquid file /////////////////
+{% layout none %}
+{
+"variants": [
+  {%- for variant in product.variants -%}
+    {%- if variant.available and variant.metafields.custom.hide_variant_ != true -%}
+    {{ variant | json }}
+    {%- endif -%}    
+  {%- endfor -%}  
+],
+"options": [
+  {% for option in product.options_with_values %}
+  {
+    "name": "{{ option.name }}",
+    "position": {{ option.position }},
+    "values": [
+      {%- assign valarray = '' -%}
+      {%- for opval in option.values -%}
+        {%- for var in product.variants -%}
+          {%- capture opname -%}option{{ option.position }}{%- endcapture -%}
+          {%- if var[opname] == opval -%}
+            {%- if var.available and var.metafields.custom.hide_variant_ != true -%}
+              {%- capture opval_new -%}"{{ opval }}"{%- endcapture -%}
+              {%- if valarray == blank -%}
+                {%- assign valarray = valarray | append: opval_new -%}
+              {%- else -%}
+                {%- assign valarray = valarray | append: ',' | append: opval_new -%}
+              {%- endif -%}
+            {%- endif -%}  
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}  
+      {{ valarray }}
+    ]
+  }
+  {%- endfor -%}
+]
+}
+
+//////// UPDATE JSON DATA IN JS FILE /////////////
+const response = await fetch(`${window.themeVariables.routes.rootUrlWithoutSlash}/products/${productHandle}.js`);
+let url = `${window.themeVariables.routes.rootUrlWithoutSlash}/products/${productHandle}?view=json`;
+let newvariants = '';
+let newoptions = '';
+await fetch(url).then(res => res.json()).then((data) => {
+  newvariants = data.variants; 
+  newoptions = data.options
+});
+const responseAsJson = await response.json();
+responseAsJson["options"] = newoptions;        
+responseAsJson["variants"] = newvariants;   
