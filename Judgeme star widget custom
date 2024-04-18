@@ -1,0 +1,13 @@
+{% if product.metafields.reviews.rating_count > 0 %}
+    <a class="custom_widget_judgeme" href="{{ product.url | append: '#judgeme_product_reviews' }}">
+      <div class='custom-container-star'>        
+        <span class='custom-star-text'>
+        {{ product.metafields.reviews.rating.value }}
+        </span>
+        <span class="{% if product.metafields.reviews.rating_count == 0 %}jdgm-star jdgm--off custom-star
+        {% elsif product.metafields.reviews.rating_count > 0 %}jdgm-star jdgm--on custom-star{% else %}jdgm-star{% endif %}"
+        data-id='{{ product.id }}'>
+        </span>
+      </div>
+    </a>
+    {% endif %}
