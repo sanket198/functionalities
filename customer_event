@@ -1,0 +1,11 @@
+analytics.subscribe("checkout_completed", function(event) {
+    var checkout = event.data.checkout;
+    ir('track', {
+      orderID: checkout.order.id, // Order ID
+      event: 'sale',
+      fname: checkout.billingAddress.firstName, // Order Name
+      email: checkout.email, // Order Email
+      mobile: checkout.phone, // Order Mobile
+      purchaseValue: checkout.totalPrice.amount, // Order Amount      
+    });
+ });
