@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number Generator</title>
+    <style>
+        /* Style for the <h3> element */
+        h3 {
+            font-size: 1.17em; /* Default font size for <h3> */
+            line-height: 1.3;  /* Default line height for <h3> */
+        }
+
+        /* Style for the <p> element to match the height of <h3> */
+        .matching-h3 {
+            font-size: 1.17em; /* Match font size of <h3> */
+            line-height: 1.3;  /* Match line height of <h3> */
+            margin: 0;         /* Remove default margin */
+        }
+    </style>
+</head>
+<body>
+    <p id="randomNumber" class="matching-h3" data-pid="{{product.id}}"></p>
+
+    <script>
+        var idselector = document.getElementById('randomNumber');
+        // Function to generate a random number between min and max
+        function generateRandomNumber(productId, min, max) {
+            // Create a seed using the productId
+            const seed = productId.toString().split('').reduce((acc, val) => acc + parseInt(val), 0);
+        
+            // Basic pseudo-random generation using seed
+            const x = Math.sin(seed) * 10000;
+            const randomNum = x - Math.floor(x);
+        
+            // Scale random number to desired range
+            return Math.floor(randomNum * (max - min + 1)) + min;
+        }        
+
+        // Function to determine if an hour has passed since the last update
+        function hasHourPassed(lastUpdated) {
+            const now = new Date();
+            const lastUpdateDate = new Date(parseInt(lastUpdated));
+            return now.getTime() - lastUpdateDate.getTime() >= 3600000; // 1 hour in milliseconds
+        }
+
+        // Function to update the random number on the page
+        function updateRandomNumber() {
+            const min = 50000;
+            const max = 60000;
+
+            let randomNumber;
+            let lastUpdated = localStorage.getItem('lastUpdated_'+idselector.getAttribute('data-pid'));
+            
+            if (lastUpdated && !hasHourPassed(lastUpdated)) {
+                // If it's not been an hour since the last update, use the existing number
+                randomNumber = localStorage.getItem('randomNumber_'+idselector.getAttribute('data-pid'));
+            } else {
+                // Generate a new random number and update localStorage
+                randomNumber = generateRandomNumber(idselector.getAttribute('data-pid'), min, max);
+                localStorage.setItem('randomNumber_'+idselector.getAttribute('data-pid'), randomNumber);
+                localStorage.setItem('lastUpdated_'+idselector.getAttribute('data-pid'), new Date().getTime());
+            }
+
+            // Display the random number in the HTML with the desired format
+            document.getElementById('randomNumber').innerHTML = `<strong>${parseInt(randomNumber).toLocaleString()}</strong> orders placed in the last 24 hours`;
+        }
+
+        // Update the random number initially
+        updateRandomNumber();
+
+        // Set an interval to update the number at the start of each hour
+        function checkForHourChange() {
+            const now = new Date();
+            const minutesUntilNextHour = 60 - now.getMinutes();
+            const millisecondsUntilNextHour = (minutesUntilNextHour * 60 * 1000) - now.getSeconds() * 1000 - now.getMilliseconds();
+            
+            // Set a timeout to update the number at the beginning of the next hour
+            setTimeout(() => {
+                updateRandomNumber();
+                setInterval(updateRandomNumber, 3600000); // Update every hour
+            }, millisecondsUntilNextHour);
+        }
+
+        // Start the check for the next hour
+        checkForHourChange();
+    </script>
+</body>
+</html>
