@@ -1,0 +1,109 @@
+///////  JS  /////
+$('body').on('click','.product-swatches .swatch', function(){
+  var _this = this;
+  _this.classList.add('loading');
+  const productHandle = this.getAttribute('data-handle');
+  const productContainer = document.getElementById('MainContent');
+
+  console.log(productContainer);
+  // Show a loading indicator (optional)
+
+  // Step 1: Fetch new product data using Shopify Product JSON API
+  fetch(`/products/${productHandle}`)
+    .then(response => response.text())
+    .then(responseHTML => {
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(responseHTML, 'text/html');
+  
+      // Extract the product content you want to append
+      const newProductContent = doc.querySelector('#MainContent');
+      
+      if (newProductContent) {
+        // Append the extracted content to the container
+        productContainer.innerHTML = newProductContent.innerHTML;
+      } else {
+        console.error('Error: Product content not found.');
+      }          
+
+      // Step 3: Update the URL without reloading the page
+      history.pushState({}, '', `/products/${productHandle}`);
+
+      // Step 4: Reinitialize Focal Theme Scripts
+      if (window.Shopify && Shopify.theme && Shopify.theme.sections) {
+        Shopify.theme.sections.load(productContainer);
+      }
+      
+      initializeScrollAnimationTrigger();
+      // Remove the loading indicator
+      _this.classList.remove('loading');
+    })
+    .catch(error => {
+      console.error('Error loading new product:', error)
+      _this.classList.remove('loading');
+    });
+});
+
+HTML ///////////////// 
+
+{% if product.metafields.custom.related_products != blank %}                          
+<div class="product_selection">
+  <label class="form__label">Flavour: </label>
+  <div class="product-swatches" >
+    {% for related_product in product.metafields.custom.related_products.value %}
+      <a href="javascript:void(0)" class="swatch {% if related_product.id == product.id %}active{% endif %}" data-handle="{{ related_product.handle }}">
+        <img src="{{ related_product.featured_image | image_url: width: 60, height: 60 }}" loading="lazy" alt="{{ related_product.title }}">
+        <span class="pdp_loader">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><radialGradient id="a12" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)"><stop offset="0" stop-color="#000000"></stop><stop offset=".3" stop-color="#000000" stop-opacity=".9"></stop><stop offset=".6" stop-color="#000000" stop-opacity=".6"></stop><stop offset=".8" stop-color="#000000" stop-opacity=".3"></stop><stop offset="1" stop-color="#000000" stop-opacity="0"></stop></radialGradient><circle transform-origin="center" fill="none" stroke="url(#a12)" stroke-width="15" stroke-linecap="round" stroke-dasharray="200 1000" stroke-dashoffset="0" cx="100" cy="100" r="70"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="360;0" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></circle><circle transform-origin="center" fill="none" opacity=".2" stroke="#000000" stroke-width="15" stroke-linecap="round" cx="100" cy="100" r="70"></circle></svg>                        
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+////////  CSS  //////
+.product_selection{
+  margin: 0 0 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, .07);
+  padding-bottom: 20px;
+}
+.product_selection .form__label{
+  margin-bottom: 8px;
+}
+.product_selection .product-swatches{
+  display: flex;
+  gap: 10px;
+}
+.product_selection .product-swatches .swatch{
+  border: 2px solid #eee;
+  border-radius: 50%;
+  padding: 8px;
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
+.product_selection .product-swatches .swatch.active{
+  border: 2px solid #1eaf6d;
+}
+.product_selection .product-swatches .swatch img{
+  width: 100%;
+}
+.product_selection .product-swatches .pdp_loader{
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 100%;
+  position: absolute;
+  height: 100%;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+.product_selection .product-swatches .swatch.loading .pdp_loader{
+  display: flex;
+}
+.product_selection .product-swatches .pdp_loader svg{
+  width: 60%;
+}
