@@ -1,0 +1,389 @@
+{%- liquid
+  # exclude free gift lines from the milestone total
+  assign gift_total = 0
+  for item in cart.items
+    if settings.free_product != blank and item.product_id == settings.free_product.id
+      assign gift_total = gift_total | plus: item.final_line_price
+    elsif settings.free_product_2 != blank and item.product_id == settings.free_product_2.id
+      assign gift_total = gift_total | plus: item.final_line_price
+    endif
+  endfor
+
+  assign original_total = cart.total_price | minus: gift_total
+  if original_total < 0
+    assign original_total = 0
+  endif
+
+  assign t1 = settings.first_threshhold | plus: 0
+  assign t2 = settings.second_threshhold | plus: 0
+  assign t3 = settings.third_threshhold | plus: 0
+
+  assign t1_cents = t1 | times: 100
+  assign t2_cents = t2 | times: 100
+  assign t3_cents = t3 | times: 100
+
+  assign tier_count = 0
+  if settings.first_threshhold != blank
+    assign tier_count = 1
+  endif
+  if settings.second_threshhold != blank
+    assign tier_count = 2
+  endif
+  if settings.third_threshhold != blank
+    assign tier_count = 3
+  endif
+
+  # equal segment width, and piecewise fill mapped onto those equal segments
+  assign seg_size = 100.0 | divided_by: tier_count
+  assign fill = 0
+  assign lower = 0
+  for i in (1..tier_count)
+    case i
+      when 1
+        assign upper = t1_cents
+      when 2
+        assign upper = t2_cents
+      when 3
+        assign upper = t3_cents
+    endcase
+    if original_total >= upper
+      assign fill = fill | plus: seg_size
+      assign lower = upper
+    else
+      if original_total > lower
+        assign span = upper | minus: lower
+        assign into = original_total | minus: lower
+        assign frac = into | times: 1.0 | divided_by: span
+        assign partial = frac | times: seg_size
+        assign fill = fill | plus: partial
+      endif
+      break
+    endif
+  endfor
+  if fill > 100
+    assign fill = 100
+  endif
+
+  assign reached = 0
+  if tier_count >= 1 and original_total >= t1_cents
+    assign reached = 1
+  endif
+  if tier_count >= 2 and original_total >= t2_cents
+    assign reached = 2
+  endif
+  if tier_count >= 3 and original_total >= t3_cents
+    assign reached = 3
+  endif
+
+  assign message = ''
+  if reached == tier_count
+    assign message = settings.success_message
+  elsif reached == 0
+    assign remaining = t1_cents | minus: original_total | money
+    assign message = settings.default_message | replace: '[price]', remaining
+  elsif reached == 1
+    assign remaining = t2_cents | minus: original_total | money
+    assign message = settings.first_threshhold_message | replace: '[price]', remaining
+  elsif reached == 2
+    assign remaining = t3_cents | minus: original_total | money
+    assign message = settings.second_threshhold_message | replace: '[price]', remaining
+  endif
+-%}
+
+{%- if tier_count > 0 -%}
+  <div class="shipping-notes-wrapper reward-bar">
+    {%- if message != blank -%}
+      <span class="shipping-notes-wrapper-text">{{ message | newline_to_br }}</span>
+    {%- endif -%}
+    <div class="reward-bar__track">
+      <div class="reward-bar__fill" style="width: {{ fill }}%;"></div>
+
+      {%- for i in (1..tier_count) -%}
+        {%- liquid
+          case i
+            when 1
+              assign seg_threshold = t1
+              assign seg_label = settings.first_threshhold_short_message
+              assign seg_pointimg = settings.point_img_1
+              assign crossed_seg_pointimg = settings.crossed_point_img_1
+            when 2
+              assign seg_threshold = t2
+              assign seg_label = settings.second_threshhold_short_message
+              assign seg_pointimg = settings.point_img_2
+              assign crossed_seg_pointimg = settings.crossed_point_img_2
+            when 3
+              assign seg_threshold = t3
+              assign seg_label = settings.third_threshhold_short_message
+              assign seg_pointimg = settings.point_img_3
+              assign crossed_seg_pointimg = settings.crossed_point_img_3
+          endcase
+          assign seg_price = seg_threshold | times: 100 | money_without_trailing_zeros
+        -%}
+        <div class="reward-bar__segment {% if reached > i %}crossed{% endif %}">
+          {%- if seg_label != blank -%}
+            <span class="reward-bar__label">{{ seg_label }}</span>
+          {%- endif -%}
+          {% comment %} <span class="reward-bar__price{% if forloop.last %} reward-bar__price--end{% endif %}">{{ seg_price }}</span> {% endcomment %}
+
+            <span class="check-point check-point-first">
+                {% if reached > i and crossed_seg_pointimg != blank %}
+                    <img src="{{ crossed_seg_pointimg | image_url: width: 28 }}" width="{{ crossed_seg_pointimg.width }}" height="{{ crossed_seg_pointimg.height }}" loading="lazy">
+                {% else %}
+                    <img src="{{ seg_pointimg | image_url: width: 28 }}" width="{{ seg_pointimg.width }}" height="{{ seg_pointimg.height }}" loading="lazy">
+                {% endif %}
+            </span>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    
+  </div>
+{%- endif -%}
+
+<style>
+  /* CART REWARD BAR */
+  .drawer__content.no_gift .shipping-notes-wrapper { display: none !important; }
+
+  .shipping-notes-wrapper { 
+    padding: 15px 20px 40px;
+    background: #EADDCD;
+    margin: 0 -20px;
+ }
+
+  .reward-bar__track {
+    position: relative;
+    display: flex;
+    margin-top: 12px;        /* room for the price labels above */
+    margin-right: 24px;
+    background: #fff;
+    border-radius: 99px;
+    height: 6px;
+  }
+
+  .reward-bar__fill {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 0;
+    background: #382A23;      /* filled portion — piecewise, driven by fill% */
+    border-radius: 99px;
+    transition: width .4s ease;
+    z-index: 0;
+  }
+
+  .reward-bar__segment {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;             /* every tier takes equal space */
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
+    padding: 2px 10px;
+  }
+  .reward-bar__segment:not(:last-child) {
+    border-right: 1px solid rgba(0, 0, 0, 0.4);
+  }
+
+  .reward-bar__label {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #726964;
+    position: absolute;
+    bottom: -28px;
+    left: 100%;
+    transform: translateX(-50%);
+    z-index: 2;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+    .reward-bar__segment.crossed .reward-bar__label{
+        color: #382A23;
+    }   
+
+  .reward-bar__segment .check-point {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    white-space: nowrap;
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* price marker at the right edge of each equal segment */
+  .reward-bar__price {
+    position: absolute;
+    top: -30px;
+    left: 100%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: rgb(var(--text-color));
+    z-index: 2;
+  }
+  {% comment %} .reward-bar__price--end {
+    transform: translateX(-100%);   /* keeps the final price inside the bar */
+  } {% endcomment %}
+
+  .shipping-notes-wrapper-text {
+    display: block;
+    margin-top: 0px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: rgb(var(--text-color));
+    {% comment %} margin-inline: auto; {% endcomment %}
+  }
+  @media screen and (max-width: 740px) {
+    .shipping-notes-wrapper {
+      padding: 10px 0 10px;
+    }
+  }
+</style>
+
+
+{
+    "name": "Milestonbar",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_milestonbar",
+        "label": "Show Milestonbar",
+        "default": false
+      },
+      {
+        "type": "product_list",
+        "id": "no_free_gift_products",
+        "label": "No Free Gift Products"
+      },
+      {
+        "type": "text",
+        "id": "shipping_amount",
+        "label": "Shipping amount",
+        "default": "99"
+      },
+      {
+        "type": "header",
+        "content": "First Threshold"
+      },
+      {
+        "type": "image_picker",
+        "id": "point_img_1",
+        "label": "Check Point Image 1"
+      },
+      {
+        "type": "image_picker",
+        "id": "crossed_point_img_1",
+        "label": "Crossed Check Point Image 1"
+      },
+      {
+        "type": "html",
+        "id": "default_message",
+        "label": "Default message",
+        "info": "EX. You are eligible for Free Shipping. <br> Spend [price] more to unlock 15% OFF"
+      },
+      {
+        "type": "text",
+        "id": "first_threshhold",
+        "label": "First threshhold price/quantity",
+        "info": "(ex for QTY= 2)(ex for Price= 500)"
+      },
+      {
+        "type": "html",
+        "id": "first_threshhold_message",
+        "label": "First unlock message",
+        "info": "EX. You have unlocked 15% OFF. Use code <b>BLEP15T</b> <br> Spend [price] more to unlock 20% OFF."
+      },
+      {
+        "type": "html",
+        "id": "first_threshhold_short_message",
+        "label": "First unlock Short message",
+        "info": "EX. 15% OFF"
+      },
+      {
+        "type": "product",
+        "id": "free_product",
+        "label": "Auto Add Product for 1st threshhold"
+      },
+      {
+        "type": "header",
+        "content": "Second Threshold"
+      },
+      {
+        "type": "image_picker",
+        "id": "point_img_2",
+        "label": "Check Point Image 2"
+      },
+      {
+        "type": "image_picker",
+        "id": "crossed_point_img_2",
+        "label": "Crossed Check Point Image 2"
+      },
+      {
+        "type": "text",
+        "id": "second_threshhold",
+        "label": "Second threshhold price/quantity",
+        "info": "(ex for QTY= 4)(ex for Price= 1000)"
+      },
+      {
+        "type": "html",
+        "id": "second_threshhold_message",
+        "label": "Second unlock message",
+        "info": "EX. You have unlocked 20% OFF. Use code <b>BLEP20T</b> <br> Spend [price] more to unlock 26% OFF"
+      },
+      {
+        "type": "html",
+        "id": "second_threshhold_short_message",
+        "label": "Second unlock short message",
+        "info": "EX. 20% OFF"
+      },
+      {
+        "type": "product",
+        "id": "free_product_2",
+        "label": "Auto Add Product for 2nd threshhold"
+      },
+      {
+        "type": "header",
+        "content": "Third Threshold"
+      },
+      {
+        "type": "image_picker",
+        "id": "point_img_3",
+        "label": "Check Point Image 3"
+      },
+      {
+        "type": "image_picker",
+        "id": "crossed_point_img_3",
+        "label": "Crossed Check Point Image 3"
+      },
+      {
+        "type": "text",
+        "id": "third_threshhold",
+        "label": "Third threshhold price/quantity",
+        "info": "(ex for QTY= 10)(ex for Price= 1500)"
+      },
+      {
+        "type": "html",
+        "id": "third_threshhold_short_message",
+        "label": "Third unlock short message",
+        "info": "EX. 26% OFF"
+      },
+      {
+        "type": "product",
+        "id": "free_product_3",
+        "label": "Auto Add Product for 3rd threshhold"
+      },
+      {
+        "type": "html",
+        "id": "success_message",
+        "label": "Success message",
+        "info": "EX. 26% OFF Unlocked. Use code <b>CODE</b>"
+      }
+    ]
+  }
